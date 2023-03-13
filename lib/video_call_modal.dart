@@ -62,14 +62,20 @@ class _VideoCallWidgetState extends State<VideoCallWidget> {
                         placeholderBuilder: (context) {
                           return Container(color: Colors.black);
                         },
+                        objectFit:
+                            RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                       ),
                     ),
                     Positioned(
                       top: 16,
                       right: 16,
-                      child: SizedBox(
+                      child: Container(
                         height: 100,
                         width: 100,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.0),
+                            border:
+                                Border.all(color: Colors.white, width: 1.0)),
                         child: RTCVideoView(
                           localRenderer,
                           mirror: true,
@@ -127,15 +133,14 @@ class _VideoCallWidgetState extends State<VideoCallWidget> {
                                             false));
                                   },
                                   backgroundColor:
-                                      (widget.session?.isMicrophoneMuted ??
-                                              true)
+                                      widget.session?.isMicrophoneMuted ?? false
                                           ? Colors.grey
                                           : Colors.green,
                                   child: Icon(
-                                      (widget.session?.isMicrophoneMuted ??
-                                              true)
-                                          ? Icons.mic_off
-                                          : Icons.mic),
+                                    widget.session?.isMicrophoneMuted ?? false
+                                        ? Icons.mic_off
+                                        : Icons.mic,
+                                  ),
                                 ),
                                 FloatingActionButton(
                                   onPressed: () {
@@ -144,12 +149,11 @@ class _VideoCallWidgetState extends State<VideoCallWidget> {
                                             false));
                                   },
                                   backgroundColor:
-                                      (widget.session?.isLocalVideoMuted ??
-                                              true)
+                                      widget.session?.isLocalVideoMuted ?? false
                                           ? Colors.grey
                                           : Colors.green,
                                   child: Icon(
-                                    (widget.session?.isLocalVideoMuted ?? true)
+                                    widget.session?.isLocalVideoMuted ?? false
                                         ? Icons.videocam_off
                                         : Icons.videocam,
                                   ),
