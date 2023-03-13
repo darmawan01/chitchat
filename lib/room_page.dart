@@ -300,20 +300,21 @@ class RoomPageState extends State<RoomPage> {
               );
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.supervisor_account_rounded),
-            onPressed: () {
-              showTransparentModalBottomSheet(
-                context,
-                (context) => CreateRoomBottomSheet(
-                  title: "Invite someone",
-                  type: SheetType.invite,
-                  buttonLabel: "Send",
-                  roomId: widget.room.id,
-                ),
-              );
-            },
-          ),
+          if (!widget.room.isDirectChat)
+            IconButton(
+              icon: const Icon(Icons.supervisor_account_rounded),
+              onPressed: () {
+                showTransparentModalBottomSheet(
+                  context,
+                  (context) => CreateRoomBottomSheet(
+                    title: "Invite someone",
+                    type: SheetType.invite,
+                    buttonLabel: "Send",
+                    roomId: widget.room.id,
+                  ),
+                );
+              },
+            ),
         ],
       ),
       body: SafeArea(

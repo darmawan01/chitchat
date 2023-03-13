@@ -55,7 +55,7 @@ class OutGoingCallWidget extends StatelessWidget {
               }
 
               return Positioned(
-                bottom: 100,
+                bottom: 120,
                 left: 0,
                 right: 0,
                 child: Align(
@@ -66,7 +66,7 @@ class OutGoingCallWidget extends StatelessWidget {
                         : 'Ringing...',
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 24,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
-import 'package:matrix_poc/room_list.dart';
+import 'package:matrix_poc/room_list_page.dart';
 import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
@@ -14,50 +16,16 @@ class LoginPage extends StatefulWidget {
 
 class LoginPageState extends State<LoginPage> {
   final _homeserverCtrl = TextEditingController();
-  final _usernameCtrl = TextEditingController(text: Platform.isAndroid ? 'opapa': 'omama');
+  final _usernameCtrl =
+      TextEditingController(text: Platform.isAndroid ? 'opapa' : 'omama');
   final _passwordCtrl = TextEditingController(text: 'Test@1234');
 
   bool _loading = false;
+  bool _isRegister = false;
 
   @override
   void initState() {
     super.initState();
-  }
-
-  void _login() async {
-    setState(() {
-      _loading = true;
-    });
-
-    try {
-      final client = Provider.of<Client>(context, listen: false);
-
-      await client.checkHomeserver(
-        Uri.http(_homeserverCtrl.text.trim(), ''),
-      );
-
-      await client.login(
-        LoginType.mLoginPassword,
-        password: _passwordCtrl.text,
-        identifier: AuthenticationUserIdentifier(user: _usernameCtrl.text),
-      );
-
-      Future.delayed(const Duration(milliseconds: 100), () {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const RoomListPage()),
-          (route) => false,
-        );
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString()),
-        ),
-      );
-      setState(() {
-        _loading = false;
-      });
-    }
   }
 
   @override
@@ -99,19 +67,95 @@ class LoginPageState extends State<LoginPage> {
                 labelText: 'Password',
               ),
             ),
+            const SizedBox(height: 24),
+            Container(
+              alignment: Alignment.centerRight,
+              child: RichText(
+                text: TextSpan(
+                  text: _isRegister
+                      ? "Have an account ? "
+                      : "Not have an account yet ? ",
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  children: [
+                    TextSpan(
+                      text: _isRegister ? " login here" : " register here",
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          setState(() {
+                            _isRegister = !_isRegister;
+                          });
+                        },
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Colors.lightBlue,
+                            fontWeight: FontWeight.bold,
+                          ),
+                    )
+                  ],
+                ),
+              ),
+            ),
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _loading ? null : _login,
+                onPressed: _loading ? null : _auth,
                 child: _loading
                     ? const CircularProgressIndicator.adaptive()
-                    : const Text('Login'),
+                    : Text(_isRegister ? 'Register' : 'Login'),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  void _auth() async {
+    setState(() {
+      _loading = true;
+    });
+
+    try {
+      final client = Provider.of<Client>(context, listen: false);
+
+      await client.checkHomeserver(
+        Uri.http("${_homeserverCtrl.text.trim()}:8008", ''),
+      );
+
+      if (_isRegister) {
+        final deviceInfoPlugin = DeviceInfoPlugin();
+        final deviceInfo = await deviceInfoPlugin.deviceInfo;
+
+        await client.register(
+          username: _usernameCtrl.text,
+          password: _passwordCtrl.text,
+          auth: AuthenticationData(type: AuthenticationTypes.dummy),
+          deviceId: deviceInfo.data.tryGet("model"),
+          kind: AccountKind.user,
+        );
+      } else {
+        await client.login(
+          LoginType.mLoginPassword,
+          password: _passwordCtrl.text,
+          identifier: AuthenticationUserIdentifier(user: _usernameCtrl.text),
+        );
+      }
+
+      Future.delayed(const Duration(milliseconds: 100), () {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const RoomListPage()),
+          (route) => false,
+        );
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+        ),
+      );
+      setState(() {
+        _loading = false;
+      });
+    }
   }
 }

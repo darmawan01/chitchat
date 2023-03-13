@@ -83,13 +83,17 @@ class CreateRoomBottomSheetState extends State<CreateRoomBottomSheet> {
 
                           switch (widget.type) {
                             case SheetType.room:
-                              await client.createRoom(
-                                name: "${_controller.text.trim()}:$myHost",
-                                isDirect: widget.direct,
-                                visibility: widget.isPrivate ?? false
-                                    ? matrix_model.Visibility.private
-                                    : matrix_model.Visibility.public,
-                              );
+                              if (widget.direct ?? false) {
+                                await client.startDirectChat(
+                                    "${_controller.text.trim()}:$myHost");
+                              } else {
+                                await client.createRoom(
+                                  name: "${_controller.text.trim()}:$myHost",
+                                  visibility: widget.isPrivate ?? false
+                                      ? matrix_model.Visibility.private
+                                      : matrix_model.Visibility.public,
+                                );
+                              }
                               break;
                             case SheetType.invite:
                               await client.inviteUser(

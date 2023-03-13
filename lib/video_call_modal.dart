@@ -117,8 +117,7 @@ class _VideoCallWidgetState extends State<VideoCallWidget> {
                                   backgroundColor: Colors.red,
                                   child: const Icon(Icons.call_end),
                                 ),
-                                if (callState.data == CallState.kRinging &&
-                                    (session.data?.answeredByUs ?? false))
+                                if (session.data?.answeredByUs ?? false)
                                   FloatingActionButton(
                                     onPressed: () {
                                       widget.session?.answer();
