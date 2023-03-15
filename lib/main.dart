@@ -24,6 +24,7 @@ void main() async {
       return db;
     },
   );
+
   await client.init();
 
   client.onEvent.stream.listen((event) {

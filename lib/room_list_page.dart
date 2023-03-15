@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:matrix/matrix.dart';
@@ -25,14 +27,16 @@ class RoomListPageState extends State<RoomListPage> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       voip.onIncomingCall.stream.listen((event) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          useSafeArea: false,
-          builder: (context) => event.type == CallType.kVoice
-              ? IncomingCallWidget(session: event)
-              : VideoCallWidget(session: event),
-        );
+        if (context.mounted) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            useSafeArea: false,
+            builder: (context) => event.type == CallType.kVoice
+                ? IncomingCallWidget(session: event)
+                : VideoCallWidget(session: event),
+          );
+        }
 
         event.onCallStateChanged.stream.listen((state) {
           if (state == CallState.kEnded && Navigator.canPop(context)) {
@@ -177,7 +181,11 @@ class RoomListPageState extends State<RoomListPage> {
   void _logout() async {
     final client = Provider.of<Client>(context, listen: false);
 
-    await client.logout();
+    try {
+      await client.logout();
+    } catch (e) {
+      log(e.toString());
+    }
 
     Future.delayed(const Duration(milliseconds: 100), () {
       Navigator.of(context).pushAndRemoveUntil(

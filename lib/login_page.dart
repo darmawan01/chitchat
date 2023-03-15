@@ -32,6 +32,7 @@ class LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Login')),
+      resizeToAvoidBottomInset: false,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -79,8 +80,8 @@ class LoginPageState extends State<LoginPage> {
                   children: [
                     TextSpan(
                       text: _isRegister ? " login here" : " register here",
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
+                      recognizer: _loading ? null : TapGestureRecognizer()
+                        ?..onTap = () {
                           setState(() {
                             _isRegister = !_isRegister;
                           });
@@ -100,7 +101,11 @@ class LoginPageState extends State<LoginPage> {
               child: ElevatedButton(
                 onPressed: _loading ? null : _auth,
                 child: _loading
-                    ? const CircularProgressIndicator.adaptive()
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator.adaptive(),
+                      )
                     : Text(_isRegister ? 'Register' : 'Login'),
               ),
             ),

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:matrix/matrix.dart';
 import 'package:matrix_poc/event.dart';
+import 'package:matrix_poc/incoming_call_modal.dart';
 import 'package:matrix_poc/outgoing_call_modal.dart';
 import 'package:matrix_poc/room_modal.dart';
 import 'package:matrix_poc/utils.dart';
@@ -73,14 +73,14 @@ class RoomPageState extends State<RoomPage> {
 
     final title = Text(
       event.senderFromMemoryOrFallback.calcDisplayname(),
-      style: Theme.of(context).textTheme.titleLarge,
+      style: Theme.of(context).textTheme.titleMedium,
     );
 
     final time = Text(
-      DateFormat("MMM d, yyyy h:mm a").format(
+      DateFormat("m/d/yyyy h:mm a").format(
         event.originServerTs,
       ),
-      style: Theme.of(context).textTheme.bodySmall,
+      style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 10),
     );
 
     return Padding(
@@ -121,16 +121,21 @@ class RoomPageState extends State<RoomPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          ...isMe ? [time, title] : [title, time]
-                        ],
+                      Align(
+                        alignment:
+                            isMe ? Alignment.centerRight : Alignment.centerLeft,
+                        child: title,
                       ),
                       const SizedBox(height: 8),
                       Text(
                         event.getDisplayEvent(timeline).text,
                         style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      const SizedBox(height: 12),
+                      Align(
+                        alignment:
+                            isMe ? Alignment.centerLeft : Alignment.centerRight,
+                        child: time,
                       ),
                     ],
                   ),
@@ -208,6 +213,27 @@ class RoomPageState extends State<RoomPage> {
     final client = Provider.of<Client>(context, listen: false);
     final voip = Provider.of<VoIP>(context, listen: false);
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      voip.onIncomingCall.stream.listen((event) {
+        if (context.mounted) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            useSafeArea: false,
+            builder: (context) => event.type == CallType.kVoice
+                ? IncomingCallWidget(session: event)
+                : VideoCallWidget(session: event),
+          );
+        }
+
+        event.onCallStateChanged.stream.listen((state) {
+          if (state == CallState.kEnded && Navigator.canPop(context)) {
+            Navigator.pop(context);
+          }
+        });
+      });
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -268,6 +294,7 @@ class RoomPageState extends State<RoomPage> {
                   showDialog(
                     context: context,
                     barrierDismissible: false,
+                    useSafeArea: false,
                     builder: (context) => VideoCallWidget(session: call),
                   );
                 },
@@ -294,13 +321,14 @@ class RoomPageState extends State<RoomPage> {
                   showDialog(
                     context: context,
                     barrierDismissible: false,
+                    useSafeArea: false,
                     builder: (context) => OutGoingCallWidget(session: call),
                   );
                 },
               );
             },
           ),
-          if (!widget.room.isDirectChat)
+          if (!widget.room.isDirectChat && widget.room.canInvite)
             IconButton(
               icon: const Icon(Icons.supervisor_account_rounded),
               onPressed: () {
@@ -361,9 +389,29 @@ class RoomPageState extends State<RoomPage> {
                                     ReceiptType.mRead,
                                     event.eventId,
                                     {},
-                                  ).catchError((onError) {
-                                    log(onError.toString());
-                                  });
+                                  );
+                                }
+
+                                if (event.type == EventTypes.CallInvite &&
+                                    event.senderId != client.userID) {
+                                  return Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 6.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(
+                                          Icons.phone_missed,
+                                          size: 24,
+                                          color: Colors.red,
+                                        ),
+                                        const SizedBox(width: 6.0),
+                                        Text(
+                                            "Missed call from ${event.senderFromMemoryOrFallback.calcDisplayname()}"),
+                                      ],
+                                    ),
+                                  );
                                 }
 
                                 return event.relationshipEventId != null ||

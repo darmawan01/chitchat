@@ -50,6 +50,7 @@ class VoipService implements WebRTCDelegate {
   void handleNewCall(CallSession session) {
     switch (session.direction) {
       case CallDirection.kIncoming:
+        player.play(AssetSource("audio/incoming-call-ringtone.wav"));
         break;
       case CallDirection.kOutgoing:
         player.play(AssetSource("audio/outgoing-call-ringtone.wav"));
@@ -61,9 +62,7 @@ class VoipService implements WebRTCDelegate {
   MediaDevices get mediaDevices => webrtc_impl.navigator.mediaDevices;
 
   @override
-  void playRingtone() {
-    player.play(AssetSource("audio/incoming-call-ringtone.wav"));
-  }
+  void playRingtone() {}
 
   @override
   void stopRingtone() {

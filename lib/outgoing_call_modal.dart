@@ -1,99 +1,119 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
-class OutGoingCallWidget extends StatelessWidget {
+class OutGoingCallWidget extends StatefulWidget {
   final CallSession? session;
 
   const OutGoingCallWidget({super.key, this.session});
 
   @override
+  State<OutGoingCallWidget> createState() => _OutGoingCallWidgetState();
+}
+
+class _OutGoingCallWidgetState extends State<OutGoingCallWidget> {
+  bool micMuted = false;
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            color: Colors.blue[500],
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-          ),
-          Positioned(
-            top: 100,
-            left: 0,
-            right: 0,
-            child: Column(
+      body: StreamBuilder(
+          stream: widget.session?.onCallStateChanged.stream,
+          builder: (context, snapshot) {
+            return Stack(
               children: [
-                CircleAvatar(
-                  radius: 50,
-                  child: Text(
-                    "${session?.remoteUser?.calcDisplayname()}"[0]
-                        .toUpperCase(),
-                    style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                Container(
+                  color: Colors.blue[500],
+                  height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width,
+                ),
+                Positioned(
+                  top: 100,
+                  left: 0,
+                  right: 0,
+                  child: Column(
+                    children: [
+                      CircleAvatar(
+                        radius: 50,
+                        child: Text(
+                          "${widget.session?.remoteUser?.calcDisplayname()}"[0]
+                              .toUpperCase(),
+                          style: Theme.of(context)
+                              .textTheme
+                              .displayMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                         ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        widget.session?.remoteUser?.calcDisplayname() ?? "",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  session?.remoteUser?.calcDisplayname() ?? "",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                if (snapshot.data != CallState.kConnected)
+                  Positioned(
+                    bottom: 120,
+                    left: 0,
+                    right: 0,
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        snapshot.data == CallState.kEnded
+                            ? 'Ended...'
+                            : 'Ringing...',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                Positioned(
+                  bottom: 50,
+                  left: 0,
+                  right: 0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      FloatingActionButton(
+                        backgroundColor: Colors.red,
+                        child: const Icon(
+                          Icons.call_end,
+                          color: Colors.white,
+                          size: 32,
+                        ),
+                        onPressed: () {
+                          widget.session?.hangup();
+                        },
+                      ),
+                      if (snapshot.data == CallState.kConnected)
+                        FloatingActionButton(
+                          onPressed: () {
+                            setState(() => micMuted = !micMuted);
+
+                            widget.session?.setMicrophoneMuted(micMuted);
+                          },
+                          backgroundColor:
+                              micMuted ? Colors.grey : Colors.green,
+                          child: Icon(
+                            micMuted ? Icons.mic_off : Icons.mic,
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ],
-            ),
-          ),
-          StreamBuilder(
-            stream: session?.onCallStateChanged.stream,
-            builder: (context, snapshot) {
-              if (snapshot.hasData && snapshot.data == CallState.kConnected) {
-                return Container();
-              }
-
-              return Positioned(
-                bottom: 120,
-                left: 0,
-                right: 0,
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    snapshot.data == CallState.kEnded
-                        ? 'Ended...'
-                        : 'Ringing...',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-          Positioned(
-            bottom: 50,
-            left: 0,
-            right: 0,
-            child: FloatingActionButton(
-              backgroundColor: Colors.red,
-              child: const Icon(
-                Icons.call_end,
-                color: Colors.white,
-                size: 32,
-              ),
-              onPressed: () {
-                session?.hangup().catchError((err) {
-                  log(err.toString());
-                });
-              },
-            ),
-          ),
-        ],
-      ),
+            );
+          }),
     );
   }
 }

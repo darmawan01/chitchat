@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:matrix/matrix.dart';
@@ -16,6 +14,8 @@ class VideoCallWidget extends StatefulWidget {
 class _VideoCallWidgetState extends State<VideoCallWidget> {
   RTCVideoRenderer localRenderer = RTCVideoRenderer();
   RTCVideoRenderer remoteRenderer = RTCVideoRenderer();
+  bool micMuted = false;
+  bool videoMuted = false;
 
   @override
   initState() {
@@ -60,7 +60,20 @@ class _VideoCallWidgetState extends State<VideoCallWidget> {
                       child: RTCVideoView(
                         remoteRenderer,
                         placeholderBuilder: (context) {
-                          return Container(color: Colors.black);
+                          return Container(
+                            color: Colors.black,
+                            child: Center(
+                              child: Text(
+                                'Connecting ...',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.copyWith(
+                                      color: Colors.white,
+                                    ),
+                              ),
+                            ),
+                          );
                         },
                         objectFit:
                             RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
@@ -73,15 +86,17 @@ class _VideoCallWidgetState extends State<VideoCallWidget> {
                         height: 100,
                         width: 100,
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8.0),
-                            border:
-                                Border.all(color: Colors.white, width: 1.0)),
+                          // borderRadius: BorderRadius.circular(8.0),
+                          border: Border.all(color: Colors.white, width: 1.0),
+                        ),
                         child: RTCVideoView(
                           localRenderer,
                           mirror: true,
                           placeholderBuilder: (context) {
                             return Container(color: Colors.black);
                           },
+                          objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+
                         ),
                       ),
                     ),
@@ -99,25 +114,17 @@ class _VideoCallWidgetState extends State<VideoCallWidget> {
                                   onPressed: () {
                                     if (callState.data ==
                                             CallState.kConnected ||
-                                        !(widget.session?.answeredByUs ??
-                                            false)) {
-                                      widget.session
-                                          ?.hangup()
-                                          .catchError((onError) {
-                                        log(onError.toString());
-                                      });
+                                        !(widget.session?.isRinging ?? false)) {
+                                      widget.session?.hangup();
                                     } else {
-                                      widget.session
-                                          ?.reject()
-                                          .catchError((onError) {
-                                        log(onError.toString());
-                                      });
+                                      widget.session?.reject();
                                     }
                                   },
                                   backgroundColor: Colors.red,
                                   child: const Icon(Icons.call_end),
                                 ),
-                                if (session.data?.answeredByUs ?? false)
+                                if ((widget.session?.isRinging ?? false) &&
+                                    callState.data != CallState.kConnected)
                                   FloatingActionButton(
                                     onPressed: () {
                                       widget.session?.answer();
@@ -127,32 +134,27 @@ class _VideoCallWidgetState extends State<VideoCallWidget> {
                                   ),
                                 FloatingActionButton(
                                   onPressed: () {
-                                    widget.session?.setMicrophoneMuted(
-                                        !(widget.session?.isMicrophoneMuted ??
-                                            false));
+                                    setState(() => micMuted = !micMuted);
+                                    
+                                    session.data?.setMicrophoneMuted(micMuted);
                                   },
                                   backgroundColor:
-                                      widget.session?.isMicrophoneMuted ?? false
-                                          ? Colors.grey
-                                          : Colors.green,
+                                      micMuted ? Colors.grey : Colors.green,
                                   child: Icon(
-                                    widget.session?.isMicrophoneMuted ?? false
-                                        ? Icons.mic_off
-                                        : Icons.mic,
+                                    micMuted ? Icons.mic_off : Icons.mic,
                                   ),
                                 ),
                                 FloatingActionButton(
                                   onPressed: () {
-                                    widget.session?.setLocalVideoMuted(
-                                        !(widget.session?.isLocalVideoMuted ??
-                                            false));
+                                    setState(() => videoMuted = !videoMuted);
+
+                                    session.data
+                                        ?.setLocalVideoMuted(videoMuted);
                                   },
                                   backgroundColor:
-                                      widget.session?.isLocalVideoMuted ?? false
-                                          ? Colors.grey
-                                          : Colors.green,
+                                      videoMuted ? Colors.grey : Colors.green,
                                   child: Icon(
-                                    widget.session?.isLocalVideoMuted ?? false
+                                    videoMuted
                                         ? Icons.videocam_off
                                         : Icons.videocam,
                                   ),
