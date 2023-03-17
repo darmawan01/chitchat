@@ -3,23 +3,23 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:matrix/matrix.dart';
-import 'package:matrix_poc/contacts_modal.dart';
-import 'package:matrix_poc/floating_action_button.dart';
-import 'package:matrix_poc/incoming_call_modal.dart';
-import 'package:matrix_poc/login_page.dart';
-import 'package:matrix_poc/room_page.dart';
-import 'package:matrix_poc/utils.dart';
-import 'package:matrix_poc/video_call_modal.dart';
+import 'package:matrix_poc/screens/login.dart';
+import 'package:matrix_poc/screens/room.dart';
+import 'package:matrix_poc/utils/utils.dart';
+import 'package:matrix_poc/widgets/contacts_modal.dart';
+import 'package:matrix_poc/widgets/floating_action_button.dart';
+import 'package:matrix_poc/widgets/incoming_call_modal.dart';
+import 'package:matrix_poc/widgets/video_call_modal.dart';
 import 'package:provider/provider.dart';
 
-class RoomListPage extends StatefulWidget {
-  const RoomListPage({Key? key}) : super(key: key);
+class RoomsScreen extends StatefulWidget {
+  const RoomsScreen({Key? key}) : super(key: key);
 
   @override
-  RoomListPageState createState() => RoomListPageState();
+  RoomsScreenState createState() => RoomsScreenState();
 }
 
-class RoomListPageState extends State<RoomListPage> {
+class RoomsScreenState extends State<RoomsScreen> {
   @override
   Widget build(BuildContext context) {
     final client = Provider.of<Client>(context, listen: false);
@@ -92,7 +92,7 @@ class RoomListPageState extends State<RoomListPage> {
                   SlidableAction(
                     flex: 1,
                     onPressed: (context) async {
-                      // TODO deleeting room
+                      
                     },
                     backgroundColor: Colors.red,
                     foregroundColor: Colors.white,
@@ -189,7 +189,7 @@ class RoomListPageState extends State<RoomListPage> {
 
     Future.delayed(const Duration(milliseconds: 100), () {
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const LoginPage()),
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
         (route) => false,
       );
     });
@@ -203,7 +203,7 @@ class RoomListPageState extends State<RoomListPage> {
     Future.delayed(const Duration(milliseconds: 100), () {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (_) => RoomPage(room: room),
+          builder: (_) => RoomScreen(room: room),
         ),
       );
     });

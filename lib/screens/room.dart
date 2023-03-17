@@ -5,23 +5,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:matrix/matrix.dart';
-import 'package:matrix_poc/event.dart';
-import 'package:matrix_poc/incoming_call_modal.dart';
-import 'package:matrix_poc/outgoing_call_modal.dart';
-import 'package:matrix_poc/room_modal.dart';
-import 'package:matrix_poc/utils.dart';
-import 'package:matrix_poc/video_call_modal.dart';
+import 'package:matrix_poc/models/event.dart';
+import 'package:matrix_poc/widgets/incoming_call_modal.dart';
+import 'package:matrix_poc/widgets/outgoing_call_modal.dart';
+import 'package:matrix_poc/widgets/room_modal.dart';
+import 'package:matrix_poc/utils/utils.dart';
+import 'package:matrix_poc/widgets/video_call_modal.dart';
 import 'package:provider/provider.dart';
 
-class RoomPage extends StatefulWidget {
+class RoomScreen extends StatefulWidget {
   final Room room;
-  const RoomPage({required this.room, Key? key}) : super(key: key);
+  const RoomScreen({required this.room, Key? key}) : super(key: key);
 
   @override
-  RoomPageState createState() => RoomPageState();
+  RoomScreenState createState() => RoomScreenState();
 }
 
-class RoomPageState extends State<RoomPage> {
+class RoomScreenState extends State<RoomScreen> {
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   final TextEditingController _sendController = TextEditingController();
   late final Future<Timeline> _timelineFuture;
@@ -227,7 +227,7 @@ class RoomPageState extends State<RoomPage> {
         }
 
         event.onCallStateChanged.stream.listen((state) {
-          if (state == CallState.kEnded && Navigator.canPop(context)) {
+          if (state == CallState.kEnded) {
             Navigator.pop(context);
           }
         });
@@ -343,6 +343,33 @@ class RoomPageState extends State<RoomPage> {
                 );
               },
             ),
+          PopupMenuButton<String>(
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem<String>(
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    horizontalTitleGap: 0,
+                    onTap: () {
+                      showConfirmDialog(context).then((value) async {
+                        if (value) {
+                          await widget.room.leave();
+
+                          Future.delayed(const Duration(milliseconds: 500), () {
+                            Navigator.pop(context);
+                          });
+                        }
+                      });
+                    },
+                    title: Text(
+                      'Leave room',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                ),
+              ];
+            },
+          ),
         ],
       ),
       body: SafeArea(

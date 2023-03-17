@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:matrix/matrix.dart';
 import 'package:matrix_poc/app.dart';
-import 'package:matrix_poc/event.dart';
-import 'package:matrix_poc/notif_service.dart';
-import 'package:matrix_poc/voip_service.dart';
+import 'package:matrix_poc/models/event.dart';
+import 'package:matrix_poc/services/notification.dart';
+import 'package:matrix_poc/services/voip.dart';
 import 'package:path_provider/path_provider.dart';
 
 void main() async {

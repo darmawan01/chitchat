@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
-import 'package:matrix_poc/login_page.dart';
-import 'package:matrix_poc/room_list_page.dart';
+import 'package:matrix_poc/screens/login.dart';
+import 'package:matrix_poc/screens/rooms.dart';
 import 'package:provider/provider.dart';
 
 class ChitChatApp extends StatelessWidget {
@@ -37,8 +37,7 @@ class ChitChatApp extends StatelessWidget {
       child: MaterialApp(
         title: 'ChitChat App',
         theme: theme,
-        home:
-            client.isLogged() ? const RoomListPage() : const LoginPage(),
+        home: client.isLogged() ? const RoomsScreen() : const LoginScreen(),
       ),
     );
   }

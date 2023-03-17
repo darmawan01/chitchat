@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:matrix_poc/room_modal.dart';
-import 'package:matrix_poc/utils.dart';
+import 'package:matrix_poc/widgets/room_modal.dart';
+import 'package:matrix_poc/utils/utils.dart';
 
 class CustomFloatingActionButton extends StatefulWidget {
   const CustomFloatingActionButton({super.key});

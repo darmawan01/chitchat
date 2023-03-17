@@ -1,4 +1,4 @@
-import 'package:matrix_poc/consts.dart';
+import 'package:matrix_poc/utils/consts.dart';
 
 class Events {
   String? type;

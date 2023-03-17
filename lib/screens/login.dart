@@ -4,17 +4,17 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
-import 'package:matrix_poc/room_list_page.dart';
+import 'package:matrix_poc/screens/rooms.dart';
 import 'package:provider/provider.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  LoginPageState createState() => LoginPageState();
+  LoginScreenState createState() => LoginScreenState();
 }
 
-class LoginPageState extends State<LoginPage> {
+class LoginScreenState extends State<LoginScreen> {
   final _homeserverCtrl = TextEditingController();
   final _usernameCtrl =
       TextEditingController(text: Platform.isAndroid ? 'opapa' : 'omama');
@@ -148,7 +148,7 @@ class LoginPageState extends State<LoginPage> {
 
       Future.delayed(const Duration(milliseconds: 100), () {
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const RoomListPage()),
+          MaterialPageRoute(builder: (_) => const RoomsScreen()),
           (route) => false,
         );
       });
