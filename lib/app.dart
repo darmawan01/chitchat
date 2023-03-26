@@ -1,5 +1,4 @@
-import 'package:chitchat/providers/page_prov.dart';
-import 'package:chitchat/screens/splash_page.dart';
+import 'package:chitchat/screens/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 import 'package:provider/provider.dart';
@@ -33,14 +32,11 @@ class ChitChatApp extends StatelessWidget {
       providers: [
         Provider<Client>(create: (context) => client),
         Provider<VoIP>(create: (context) => voip),
-        ChangeNotifierProvider<PageProvider>(
-          create: (context) => PageProvider(),
-        ),
       ],
       child: MaterialApp(
-        title: 'ChitChat App',
+        title: 'ChitChat',
         theme: theme,
-        home: SplashPage(
+        home: SplashScreen(
           client: client,
         ),
       ),

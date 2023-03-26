@@ -1,15 +1,11 @@
-import 'dart:developer';
-
+import 'package:chitchat/screens/room.dart';
+import 'package:chitchat/utils/utils.dart';
+import 'package:chitchat/widgets/incoming_call_modal.dart';
+import 'package:chitchat/widgets/room_modal.dart';
+import 'package:chitchat/widgets/video_call_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:matrix/matrix.dart';
-import 'package:chitchat/screens/login.dart';
-import 'package:chitchat/screens/room.dart';
-import 'package:chitchat/utils/utils.dart';
-import 'package:chitchat/widgets/contacts_modal.dart';
-import 'package:chitchat/widgets/floating_action_button.dart';
-import 'package:chitchat/widgets/incoming_call_modal.dart';
-import 'package:chitchat/widgets/video_call_modal.dart';
 import 'package:provider/provider.dart';
 
 class RoomsScreen extends StatefulWidget {
@@ -47,156 +43,141 @@ class RoomsScreenState extends State<RoomsScreen> {
     });
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Your Rooms'),
-        centerTitle: false,
-        actions: <Widget>[
-          PopupMenuButton<String>(
-            itemBuilder: (BuildContext context) {
-              return [
-                PopupMenuItem<String>(
-                  child: ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    horizontalTitleGap: 0,
-                    onTap: _contacts,
-                    leading: const Icon(Icons.contacts_rounded),
-                    title: const Text('Contract'),
+      body: Column(
+        children: [
+          Container(
+            height: 35,
+            decoration: const BoxDecoration(
+              border: Border(
+                bottom: BorderSide(color: Colors.blue),
+              ),
+            ),
+            padding: const EdgeInsets.only(left: 16, right: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: _directChat,
+                  child: Text(
+                    "Direct Message",
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(color: Colors.blue),
                   ),
                 ),
-                PopupMenuItem<String>(
-                  child: ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    horizontalTitleGap: 0,
-                    onTap: _logout,
-                    leading: const Icon(Icons.lock_outline),
-                    title: const Text('Logout'),
+                TextButton(
+                  onPressed: _newGroup,
+                  child: Text(
+                    "New Group",
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(color: Colors.blue),
                   ),
-                ),
-              ];
-            },
+                )
+              ],
+            ),
+          ),
+          Expanded(
+            child: StreamBuilder(
+              stream: client.onSync.stream,
+              builder: (context, _) => ListView.builder(
+                itemCount: client.rooms.length,
+                itemBuilder: (context, i) {
+                  final room = client.rooms[i];
+                  final myHost = client.userID?.split(":")[1];
+
+                  return Slidable(
+                    endActionPane: ActionPane(
+                      motion: const ScrollMotion(),
+                      children: [
+                        SlidableAction(
+                          flex: 1,
+                          onPressed: (context) async {
+                            showConfirmDialog(context).then((value) async {
+                              if (value) {
+                                await room.leave();
+                              }
+                            });
+                          },
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          icon: Icons.delete_forever,
+                          label: 'Delete',
+                        ),
+                      ],
+                    ),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        foregroundImage: room.avatar == null
+                            ? null
+                            : NetworkImage(
+                                room.avatar!
+                                    .getThumbnail(
+                                      client,
+                                      width: 56,
+                                      height: 56,
+                                    )
+                                    .toString(),
+                              ),
+                        child: room.avatar == null
+                            ? Text(
+                                client.rooms[i]
+                                    .getLocalizedDisplayname()[0]
+                                    .toUpperCase(),
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            : null,
+                      ),
+                      title: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              room
+                                  .getLocalizedDisplayname()
+                                  .replaceAll(":$myHost", ""),
+                            ),
+                          ),
+                          if (room.notificationCount > 0)
+                            Material(
+                              borderRadius: BorderRadius.circular(99),
+                              color: Colors.red,
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: Text(
+                                  room.notificationCount.toString(),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                        color: Colors.white,
+                                      ),
+                                ),
+                              ),
+                            )
+                        ],
+                      ),
+                      subtitle: Text(
+                        room.lastEvent?.text.isNotEmpty ?? false
+                            ? room.lastEvent!.text
+                            : 'No messages',
+                        maxLines: 1,
+                      ),
+                      onTap: () => _join(client.rooms[i]),
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
         ],
       ),
-      body: StreamBuilder(
-        stream: client.onSync.stream,
-        builder: (context, _) => ListView.builder(
-          itemCount: client.rooms.length,
-          itemBuilder: (context, i) {
-            final room = client.rooms[i];
-            final myHost = client.userID?.split(":")[1];
-
-            return Slidable(
-              endActionPane: ActionPane(
-                motion: const ScrollMotion(),
-                children: [
-                  SlidableAction(
-                    flex: 1,
-                    onPressed: (context) async {
-                      showConfirmDialog(context).then((value) async {
-                        if (value) {
-                          await room.leave();
-                        }
-                      });
-                    },
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white,
-                    icon: Icons.delete_forever,
-                    label: 'Delete',
-                  ),
-                ],
-              ),
-              child: ListTile(
-                leading: CircleAvatar(
-                  foregroundImage: room.avatar == null
-                      ? null
-                      : NetworkImage(
-                          room.avatar!
-                              .getThumbnail(
-                                client,
-                                width: 56,
-                                height: 56,
-                              )
-                              .toString(),
-                        ),
-                  child: room.avatar == null
-                      ? Text(
-                          client.rooms[i]
-                              .getLocalizedDisplayname()[0]
-                              .toUpperCase(),
-                          style: const TextStyle(
-                            fontSize: 24,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )
-                      : null,
-                ),
-                title: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        room
-                            .getLocalizedDisplayname()
-                            .replaceAll(":$myHost", ""),
-                      ),
-                    ),
-                    if (room.notificationCount > 0)
-                      Material(
-                        borderRadius: BorderRadius.circular(99),
-                        color: Colors.red,
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Text(
-                            room.notificationCount.toString(),
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                                  color: Colors.white,
-                                ),
-                          ),
-                        ),
-                      )
-                  ],
-                ),
-                subtitle: Text(
-                  room.lastEvent?.text.isNotEmpty ?? false
-                      ? room.lastEvent!.text
-                      : 'No messages',
-                  maxLines: 1,
-                ),
-                onTap: () => _join(client.rooms[i]),
-              ),
-            );
-          },
-        ),
-      ),
-      floatingActionButton: const CustomFloatingActionButton(),
     );
-  }
-
-  void _contacts() {
-    showTransparentModalBottomSheet(
-      context,
-      (context) => const ContactsModal(),
-    );
-  }
-
-  void _logout() async {
-    final client = Provider.of<Client>(context, listen: false);
-
-    try {
-      await client.logout();
-    } catch (e) {
-      log(e.toString());
-    }
-
-    Future.delayed(const Duration(milliseconds: 100), () {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-        (route) => false,
-      );
-    });
   }
 
   void _join(Room room) async {
@@ -211,5 +192,28 @@ class RoomsScreenState extends State<RoomsScreen> {
         ),
       );
     });
+  }
+
+  void _directChat() {
+    showTransparentModalBottomSheet(
+      context,
+      (context) => const CreateRoomBottomSheet(
+        title: 'Chat Someone',
+        type: SheetType.room,
+        buttonLabel: 'Send',
+        direct: true,
+      ),
+    );
+  }
+
+  void _newGroup() {
+    showTransparentModalBottomSheet(
+      context,
+      (context) => const CreateRoomBottomSheet(
+        title: 'New Room',
+        type: SheetType.room,
+        buttonLabel: 'Create',
+      ),
+    );
   }
 }

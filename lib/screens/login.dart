@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:chitchat/screens/main_page.dart';
+import 'package:chitchat/screens/base.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -148,7 +148,7 @@ class LoginScreenState extends State<LoginScreen> {
 
       Future.delayed(const Duration(milliseconds: 100), () {
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const MainPage()),
+          MaterialPageRoute(builder: (_) => const BaseScreen()),
           (route) => false,
         );
       });

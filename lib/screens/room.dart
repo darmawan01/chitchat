@@ -1,16 +1,16 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
-import 'package:matrix/matrix.dart';
 import 'package:chitchat/models/event.dart';
 import 'package:chitchat/utils/utils.dart';
 import 'package:chitchat/widgets/incoming_call_modal.dart';
 import 'package:chitchat/widgets/outgoing_call_modal.dart';
 import 'package:chitchat/widgets/room_modal.dart';
 import 'package:chitchat/widgets/video_call_modal.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import 'package:matrix/matrix.dart';
 import 'package:provider/provider.dart';
 
 class RoomScreen extends StatefulWidget {
@@ -394,80 +394,99 @@ class RoomScreenState extends State<RoomScreen> {
 
                       return Column(
                         children: [
-                          Center(
-                            child: TextButton(
-                              onPressed: timeline.requestHistory,
-                              child: const Text('Load more...'),
-                            ),
-                          ),
-                          const Divider(height: 1),
                           Expanded(
-                            child: AnimatedList(
-                              key: _listKey,
-                              reverse: true,
-                              initialItemCount: events.length,
-                              itemBuilder: (context, i, animation) {
-                                final event = events[i];
-                                final isMe = event.senderId == client.userID;
+                            child: RefreshIndicator(
+                              onRefresh: timeline.requestHistory,
+                              child: AnimatedList(
+                                key: _listKey,
+                                reverse: true,
+                                initialItemCount: events.length,
+                                itemBuilder: (context, i, animation) {
+                                  final event = events[i];
+                                  final isMe = event.senderId == client.userID;
 
-                                if (event.roomId != null &&
-                                    !event.redacted &&
-                                    !isMe) {
-                                  client.postReceipt(
-                                    event.roomId!,
-                                    ReceiptType.mRead,
-                                    event.eventId,
-                                    {},
-                                  );
-                                }
+                                  if (event.roomId != null &&
+                                      !event.redacted &&
+                                      !isMe) {
+                                    client.postReceipt(
+                                      event.roomId!,
+                                      ReceiptType.mRead,
+                                      event.eventId,
+                                      {},
+                                    );
+                                  }
 
-                                if (event.type == EventTypes.CallInvite &&
-                                    event.senderId != client.userID) {
-                                  return Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 6.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        const Icon(
-                                          Icons.phone_missed,
-                                          size: 24,
-                                          color: Colors.red,
-                                        ),
-                                        const SizedBox(width: 6.0),
-                                        Text(
-                                            "Missed call from ${event.senderFromMemoryOrFallback.calcDisplayname()}"),
-                                      ],
-                                    ),
-                                  );
-                                }
-
-                                return event.relationshipEventId != null ||
-                                        event.redacted ||
-                                        event
-                                            .getDisplayEvent(timeline)
-                                            .text
-                                            .isEmpty
-                                    ? Container()
-                                    : ScaleTransition(
-                                        scale: animation,
-                                        child: Opacity(
-                                          opacity:
-                                              event.status.isSent ? 1 : 0.5,
-                                          child: messageItem(
-                                            event,
-                                            timeline,
-                                            isMe,
+                                  if (event.type == EventTypes.CallInvite &&
+                                      event.senderId != client.userID) {
+                                    return Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 6.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(
+                                            Icons.phone_missed,
+                                            size: 24,
+                                            color: Colors.red,
                                           ),
-                                        ),
-                                      );
-                              },
+                                          const SizedBox(width: 6.0),
+                                          Text(
+                                              "Missed call from ${event.senderFromMemoryOrFallback.calcDisplayname()}"),
+                                        ],
+                                      ),
+                                    );
+                                  }
+
+                                  return event.relationshipEventId != null ||
+                                          event.redacted ||
+                                          event
+                                              .getDisplayEvent(timeline)
+                                              .text
+                                              .isEmpty
+                                      ? Container()
+                                      : ScaleTransition(
+                                          scale: animation,
+                                          child: Opacity(
+                                            opacity:
+                                                event.status.isSent ? 1 : 0.5,
+                                            child: messageItem(
+                                              event,
+                                              timeline,
+                                              isMe,
+                                            ),
+                                          ),
+                                        );
+                                },
+                              ),
                             ),
                           ),
                         ],
                       );
                     },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    bottom: 8,
+                    top: 8,
+                  ),
+                  child: Wrap(
+                    spacing: 8,
+                    children: [
+                      _quickMessage(
+                          label: "Emergency",
+                          color: Colors.red,
+                          onClick: () {},
+                          icon: const Icon(Icons.emergency_outlined)),
+                      _quickMessage(
+                          label: "Help",
+                          color: Colors.yellow,
+                          onClick: () {},
+                          icon: const Icon(Icons.emoji_people_outlined)),
+                    ],
                   ),
                 ),
                 const Divider(height: 1),
@@ -510,5 +529,33 @@ class RoomScreenState extends State<RoomScreen> {
   void _send() {
     widget.room.sendTextEvent(_sendController.text.trim());
     _sendController.clear();
+  }
+
+  Widget _quickMessage({
+    required Color color,
+    required String label,
+    required Function() onClick,
+    required Widget icon,
+  }) {
+    return InkWell(
+      onTap: onClick,
+      child: Card(
+        color: color,
+        child: Container(
+          height: 35,
+          padding: const EdgeInsets.all(4.0),
+          width: 120,
+          child: Row(
+            children: [
+              icon,
+              Text(
+                label,
+                style: Theme.of(context).textTheme.bodyMedium,
+              )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

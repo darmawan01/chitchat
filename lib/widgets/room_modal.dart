@@ -2,9 +2,9 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
-import 'package:provider/provider.dart';
 // ignore: depend_on_referenced_packages, implementation_imports
 import 'package:matrix_api_lite/src/generated/model.dart' as matrix_model;
+import 'package:provider/provider.dart';
 
 enum SheetType { room, invite }
 
@@ -15,7 +15,6 @@ class CreateRoomBottomSheet extends StatefulWidget {
 
   final String? roomId;
   final bool? direct;
-  final bool? isPrivate;
 
   const CreateRoomBottomSheet({
     super.key,
@@ -24,7 +23,6 @@ class CreateRoomBottomSheet extends StatefulWidget {
     required this.buttonLabel,
     this.roomId,
     this.direct = false,
-    this.isPrivate = false,
   });
 
   @override
@@ -33,6 +31,7 @@ class CreateRoomBottomSheet extends StatefulWidget {
 
 class CreateRoomBottomSheetState extends State<CreateRoomBottomSheet> {
   final _controller = TextEditingController();
+  bool _isPrivate = false;
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +67,21 @@ class CreateRoomBottomSheetState extends State<CreateRoomBottomSheet> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              if (!(widget.direct ?? false)) ...[
+                const SizedBox(height: 16.0),
+                Row(
+                  children: [
+                    Switch.adaptive(
+                      value: _isPrivate,
+                      onChanged: (val) {
+                        setState(() => _isPrivate = val);
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    Text(_isPrivate ? "Private" : "Public")
+                  ],
+                ),
+              ],
               const SizedBox(height: 16.0),
               TextField(
                 controller: _controller,
@@ -89,7 +103,7 @@ class CreateRoomBottomSheetState extends State<CreateRoomBottomSheet> {
                               } else {
                                 await client.createRoom(
                                   name: "${_controller.text.trim()}:$myHost",
-                                  visibility: widget.isPrivate ?? false
+                                  visibility: _isPrivate
                                       ? matrix_model.Visibility.private
                                       : matrix_model.Visibility.public,
                                 );
