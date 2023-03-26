@@ -1,6 +1,6 @@
 {
-    "name": "matrix_poc",
-    "short_name": "matrix_poc",
+    "name": "chitchat",
+    "short_name": "chitchat",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

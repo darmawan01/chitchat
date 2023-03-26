@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:matrix_poc/providers/page_prov.dart';
-import 'package:matrix_poc/screens/rooms.dart';
+import 'package:chitchat/providers/page_prov.dart';
+import 'package:chitchat/screens/rooms.dart';
 import 'package:provider/provider.dart';
 
 class MainPage extends StatefulWidget {

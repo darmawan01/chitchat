@@ -5,18 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "matrix_poc",
+            "name": "chitchat",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "matrix_poc (profile mode)",
+            "name": "chitchat (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "matrix_poc (release mode)",
+            "name": "chitchat (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"

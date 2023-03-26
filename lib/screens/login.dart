@@ -4,7 +4,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
-import 'package:matrix_poc/screens/rooms.dart';
+import 'package:chitchat/screens/rooms.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -15,9 +15,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class LoginScreenState extends State<LoginScreen> {
-  final _homeserverCtrl = TextEditingController(
-    text: "3.27.93.95"
-  );
+  final _homeserverCtrl = TextEditingController(text: "3.27.93.95");
   final _usernameCtrl =
       TextEditingController(text: Platform.isAndroid ? 'opapa' : 'omama');
   final _passwordCtrl = TextEditingController(text: 'Test@1234');

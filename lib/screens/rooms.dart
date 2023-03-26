@@ -3,13 +3,13 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:matrix/matrix.dart';
-import 'package:matrix_poc/screens/login.dart';
-import 'package:matrix_poc/screens/room.dart';
-import 'package:matrix_poc/utils/utils.dart';
-import 'package:matrix_poc/widgets/contacts_modal.dart';
-import 'package:matrix_poc/widgets/floating_action_button.dart';
-import 'package:matrix_poc/widgets/incoming_call_modal.dart';
-import 'package:matrix_poc/widgets/video_call_modal.dart';
+import 'package:chitchat/screens/login.dart';
+import 'package:chitchat/screens/room.dart';
+import 'package:chitchat/utils/utils.dart';
+import 'package:chitchat/widgets/contacts_modal.dart';
+import 'package:chitchat/widgets/floating_action_button.dart';
+import 'package:chitchat/widgets/incoming_call_modal.dart';
+import 'package:chitchat/widgets/video_call_modal.dart';
 import 'package:provider/provider.dart';
 
 class RoomsScreen extends StatefulWidget {

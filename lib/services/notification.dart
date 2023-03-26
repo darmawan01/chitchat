@@ -1,7 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-const notificationId = "matrix_poc_001";
-const notificationChannelId = 'matrix_poc_002';
+const notificationId = "chitchat_001";
+const notificationChannelId = 'chitchat_002';
 
 class NotificationService {
   final FlutterLocalNotificationsPlugin notificationsPlugin =

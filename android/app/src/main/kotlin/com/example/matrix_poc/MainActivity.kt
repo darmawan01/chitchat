@@ -1,4 +1,4 @@
-package com.example.matrix_poc
+package com.example.chitchat
 
 import io.flutter.embedding.android.FlutterActivity
 

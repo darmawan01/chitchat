@@ -1,7 +1,7 @@
+import 'package:chitchat/providers/page_prov.dart';
+import 'package:chitchat/screens/splash_page.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
-import 'package:matrix_poc/providers/page_prov.dart';
-import 'package:matrix_poc/screens/splash_page.dart';
 import 'package:provider/provider.dart';
 
 class ChitChatApp extends StatelessWidget {

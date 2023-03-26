@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
-import 'package:matrix_poc/screens/login.dart';
-import 'package:matrix_poc/screens/main_page.dart';
+import 'package:chitchat/screens/login.dart';
+import 'package:chitchat/screens/main_page.dart';
 
 class SplashPage extends StatefulWidget {
   final Client client;
