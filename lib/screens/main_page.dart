@@ -30,7 +30,7 @@ class _MainPageState extends State<MainPage> {
             children: [
               IconButton(
                 onPressed: () {
-                  pageProv.setPage(0);
+                  // pageProv.setPage(0);
                 },
                 icon: Icon(
                   Icons.history,
@@ -41,7 +41,7 @@ class _MainPageState extends State<MainPage> {
               ),
               IconButton(
                 onPressed: () {
-                  pageProv.setPage(1);
+                  // pageProv.setPage(1);
                 },
                 icon: Icon(
                   Icons.person,
