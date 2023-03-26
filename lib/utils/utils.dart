@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 Future showTransparentModalBottomSheet(
@@ -12,26 +15,54 @@ Future showTransparentModalBottomSheet(
   );
 }
 
-Future showConfirmDialog(BuildContext context) {
+Future showConfirmDialog(
+  BuildContext context, {
+  String? title,
+  Widget? content,
+}) {
   return showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          content: const Text('Are you sure you want to exit?'),
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      if (Platform.isIOS) {
+        return CupertinoAlertDialog(
+          title: Text(title ?? "Confirm !"),
+          content: content,
           actions: <Widget>[
-            TextButton(
+            CupertinoDialogAction(
               child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
             ),
-            TextButton(
-              child: const Text('Leave room'),
+            CupertinoDialogAction(
+              child: const Text('Ok'),
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
             ),
           ],
         );
-      });
+      }
+
+      return AlertDialog(
+        title: Text(title ?? "Confirm !"),
+        content: content,
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
+          ),
+          TextButton(
+            child: const Text('Ok'),
+            onPressed: () {
+              Navigator.of(context).pop(true);
+            },
+          ),
+        ],
+      );
+    },
+  );
 }

@@ -15,7 +15,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class LoginScreenState extends State<LoginScreen> {
-  final _homeserverCtrl = TextEditingController();
+  final _homeserverCtrl = TextEditingController(
+    text: "3.27.93.95"
+  );
   final _usernameCtrl =
       TextEditingController(text: Platform.isAndroid ? 'opapa' : 'omama');
   final _passwordCtrl = TextEditingController(text: 'Test@1234');

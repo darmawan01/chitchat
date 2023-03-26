@@ -9,9 +9,7 @@ class VoipService implements WebRTCDelegate {
   final player = AudioPlayer();
 
   @override
-  void handleCallEnded(CallSession session) {
-    // handle call ended by local or remote
-  }
+  void handleCallEnded(CallSession session) {}
 
   @override
   bool get canHandleNewCall => true;
@@ -47,13 +45,15 @@ class VoipService implements WebRTCDelegate {
   }
 
   @override
-  void handleNewCall(CallSession session) {
+  Future<void> handleNewCall(CallSession session) async {
     switch (session.direction) {
       case CallDirection.kIncoming:
-        player.play(AssetSource("audio/incoming-call-ringtone.wav"));
+        player.play(AssetSource('audio/incoming-call-ringtone.wav'));
+
         break;
       case CallDirection.kOutgoing:
-        player.play(AssetSource("audio/outgoing-call-ringtone.wav"));
+        player.play(AssetSource('audio/outgoing-call-ringtone.wav'));
+
         break;
     }
   }

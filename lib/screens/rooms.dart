@@ -92,7 +92,11 @@ class RoomsScreenState extends State<RoomsScreen> {
                   SlidableAction(
                     flex: 1,
                     onPressed: (context) async {
-                      
+                      showConfirmDialog(context).then((value) async {
+                        if (value) {
+                          await room.leave();
+                        }
+                      });
                     },
                     backgroundColor: Colors.red,
                     foregroundColor: Colors.white,

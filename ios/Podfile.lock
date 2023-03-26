@@ -1,10 +1,14 @@
 PODS:
   - audioplayers_darwin (0.0.1):
     - Flutter
+  - CryptoSwift (1.6.0)
   - device_info_plus (0.0.1):
     - Flutter
   - Flutter (1.0.0)
   - flutter_background_service_ios (0.0.3):
+    - Flutter
+  - flutter_callkeep (0.3.0):
+    - CryptoSwift
     - Flutter
   - flutter_local_notifications (0.0.1):
     - Flutter
@@ -27,6 +31,7 @@ DEPENDENCIES:
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - Flutter (from `Flutter`)
   - flutter_background_service_ios (from `.symlinks/plugins/flutter_background_service_ios/ios`)
+  - flutter_callkeep (from `.symlinks/plugins/flutter_callkeep/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_olm (from `.symlinks/plugins/flutter_olm/ios`)
   - flutter_openssl_crypto (from `.symlinks/plugins/flutter_openssl_crypto/ios`)
@@ -35,6 +40,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - CryptoSwift
     - OpenSSL-Universal
     - WebRTC-SDK
 
@@ -47,6 +53,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_background_service_ios:
     :path: ".symlinks/plugins/flutter_background_service_ios/ios"
+  flutter_callkeep:
+    :path: ".symlinks/plugins/flutter_callkeep/ios"
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
   flutter_olm:
@@ -60,9 +68,11 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   audioplayers_darwin: 877d9a4d06331c5c374595e46e16453ac7eafa40
+  CryptoSwift: 562f8eceb40e80796fffc668b0cad9313284cfa6
   device_info_plus: e5c5da33f982a436e103237c0c85f9031142abed
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   flutter_background_service_ios: e30e0d3ee69e4cee66272d0c78eacd48c2e94aac
+  flutter_callkeep: e94ee31d8797776cee91bf288c62ca4aa89fb5a8
   flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
   flutter_olm: 12b6a2af66b8e68b5c566d27d942ce085dadfd33
   flutter_openssl_crypto: 636ad25f56fbe0f45b9e13b8589540b341a486a1

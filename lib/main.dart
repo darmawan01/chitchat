@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:matrix/matrix.dart';
@@ -23,6 +24,7 @@ void main() async {
       await db.open();
       return db;
     },
+    logLevel: kReleaseMode ? Level.warning : Level.verbose,
   );
 
   await client.init();

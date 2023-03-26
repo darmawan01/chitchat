@@ -165,8 +165,6 @@ class _VideoCallWidgetState extends State<VideoCallWidget> {
                             ),
                           ),
                           onDragEnd: (details) {
-                            print(details.offset.dx);
-                            print(details.offset.dy);
                             updatePosition(details.offset);
                           },
                           child: GestureDetector(
