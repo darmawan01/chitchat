@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:matrix/matrix.dart';
-import 'package:matrix_poc/models/event.dart';
-import 'package:matrix_poc/utils/utils.dart';
-import 'package:matrix_poc/widgets/incoming_call_modal.dart';
-import 'package:matrix_poc/widgets/outgoing_call_modal.dart';
-import 'package:matrix_poc/widgets/room_modal.dart';
-import 'package:matrix_poc/widgets/video_call_modal.dart';
+import 'package:chitchat/models/event.dart';
+import 'package:chitchat/utils/utils.dart';
+import 'package:chitchat/widgets/incoming_call_modal.dart';
+import 'package:chitchat/widgets/outgoing_call_modal.dart';
+import 'package:chitchat/widgets/room_modal.dart';
+import 'package:chitchat/widgets/video_call_modal.dart';
 import 'package:provider/provider.dart';
 
 class RoomScreen extends StatefulWidget {
@@ -351,7 +351,9 @@ class RoomScreenState extends State<RoomScreen> {
                     contentPadding: EdgeInsets.zero,
                     horizontalTitleGap: 0,
                     onTap: () {
-                      showConfirmDialog(context, ).then((value) async {
+                      showConfirmDialog(
+                        context,
+                      ).then((value) async {
                         if (value) {
                           await widget.room.leave();
 

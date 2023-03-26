@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.matrix_poc">
+    package="com.example.chitchat">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-feature android:name="android.hardware.camera" />
@@ -11,7 +11,7 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     
    <application
-        android:label="matrix_poc"
+        android:label="ChitChat"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

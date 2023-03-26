@@ -1,4 +1,4 @@
-# matrix_poc
+# chitchat
 
 A new Flutter project.
 

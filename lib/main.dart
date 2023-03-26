@@ -5,10 +5,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:matrix/matrix.dart';
-import 'package:matrix_poc/app.dart';
-import 'package:matrix_poc/models/event.dart';
-import 'package:matrix_poc/services/notification.dart';
-import 'package:matrix_poc/services/voip.dart';
+import 'package:chitchat/app.dart';
+import 'package:chitchat/models/event.dart';
+import 'package:chitchat/services/notification.dart';
+import 'package:chitchat/services/voip.dart';
 import 'package:path_provider/path_provider.dart';
 
 void main() async {
@@ -35,12 +35,12 @@ void main() async {
     if (e.sender != client.userID && e.isEventMessage) {
       FlutterBackgroundService().invoke(
         "message",
-        {"title": "Matrix POC", "body": e.content?.body ?? ""},
+        {"title": e.sender, "body": e.content?.body ?? ""},
       );
 
       // if (Platform.isIOS) {
       //   NotificationService().showNotification(
-      //     title: "Matrix POC",
+      //     title: e.sender,
       //     body: e.content?.body ?? "",
       //   );
       // }

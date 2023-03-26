@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
-import 'package:matrix_poc/screens/login.dart';
-import 'package:matrix_poc/screens/rooms.dart';
+import 'package:chitchat/screens/login.dart';
+import 'package:chitchat/screens/rooms.dart';
 import 'package:provider/provider.dart';
 
 class ChitChatApp extends StatelessWidget {
