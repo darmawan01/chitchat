@@ -1,10 +1,10 @@
 import 'dart:io';
 
+import 'package:chitchat/screens/main_page.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
-import 'package:chitchat/screens/rooms.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -148,7 +148,7 @@ class LoginScreenState extends State<LoginScreen> {
 
       Future.delayed(const Duration(milliseconds: 100), () {
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const RoomsScreen()),
+          MaterialPageRoute(builder: (_) => const MainPage()),
           (route) => false,
         );
       });
