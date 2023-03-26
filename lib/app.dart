@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
-import 'package:chitchat/screens/login.dart';
-import 'package:chitchat/screens/rooms.dart';
+import 'package:matrix_poc/providers/page_prov.dart';
+import 'package:matrix_poc/screens/splash_page.dart';
 import 'package:provider/provider.dart';
 
 class ChitChatApp extends StatelessWidget {
@@ -32,12 +32,17 @@ class ChitChatApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         Provider<Client>(create: (context) => client),
-        Provider<VoIP>(create: (context) => voip)
+        Provider<VoIP>(create: (context) => voip),
+        ChangeNotifierProvider<PageProvider>(
+          create: (context) => PageProvider(),
+        ),
       ],
       child: MaterialApp(
         title: 'ChitChat App',
         theme: theme,
-        home: client.isLogged() ? const RoomsScreen() : const LoginScreen(),
+        home: SplashPage(
+          client: client,
+        ),
       ),
     );
   }
