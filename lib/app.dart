@@ -1,5 +1,7 @@
+import 'package:chitchat/common/theme/default.dart';
 import 'package:chitchat/screens/splash.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:matrix/matrix.dart';
 import 'package:provider/provider.dart';
 
@@ -15,18 +17,12 @@ class ChitChatApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).copyWith(
-      visualDensity: VisualDensity.adaptivePlatformDensity,
-      appBarTheme: const AppBarTheme(
-        color: Colors.blue,
-        elevation: 0,
-        toolbarTextStyle: TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.white,
+      statusBarIconBrightness: Brightness.dark,
+      systemNavigationBarIconBrightness: Brightness.dark,
+    ));
 
     return MultiProvider(
       providers: [
@@ -35,10 +31,9 @@ class ChitChatApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'ChitChat',
-        theme: theme,
-        home: SplashScreen(
-          client: client,
-        ),
+        theme: defaultTheme(context),
+        debugShowCheckedModeBanner: false,
+        home: SplashScreen(client: client),
       ),
     );
   }

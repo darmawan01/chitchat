@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:chitchat/screens/base.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/gestures.dart';
@@ -15,10 +13,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class LoginScreenState extends State<LoginScreen> {
-  final _homeserverCtrl = TextEditingController(text: "3.27.93.95");
-  final _usernameCtrl =
-      TextEditingController(text: Platform.isAndroid ? 'opapa' : 'omama');
-  final _passwordCtrl = TextEditingController(text: 'Test@1234');
+  final _homeserver = "3.27.93.95";
+  final _usernameCtrl = TextEditingController();
+  final _passwordCtrl = TextEditingController();
 
   bool _loading = false;
   bool _isRegister = false;
@@ -31,86 +28,102 @@ class LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
       resizeToAvoidBottomInset: false,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _homeserverCtrl,
-              readOnly: _loading,
-              autocorrect: false,
-              decoration: const InputDecoration(
-                prefixText: 'http://',
-                border: OutlineInputBorder(),
-                labelText: 'Homeserver',
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _usernameCtrl,
-              readOnly: _loading,
-              autocorrect: false,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Username',
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _passwordCtrl,
-              readOnly: _loading,
-              autocorrect: false,
-              obscureText: true,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Password',
-              ),
-            ),
-            const SizedBox(height: 24),
-            Container(
-              alignment: Alignment.centerRight,
-              child: RichText(
-                text: TextSpan(
-                  text: _isRegister
-                      ? "Have an account ? "
-                      : "Not have an account yet ? ",
-                  style: Theme.of(context).textTheme.bodyMedium,
+      body: Stack(
+        alignment: Alignment.center,
+        children: [
+          Positioned(
+            top: MediaQuery.of(context).size.height * .3,
+            child: Card(
+              child: Container(
+                width: MediaQuery.of(context).size.height * .40,
+                height: 350,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
                   children: [
-                    TextSpan(
-                      text: _isRegister ? " login here" : " register here",
-                      recognizer: _loading ? null : TapGestureRecognizer()
-                        ?..onTap = () {
-                          setState(() {
-                            _isRegister = !_isRegister;
-                          });
-                        },
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.lightBlue,
-                            fontWeight: FontWeight.bold,
+                    Text(
+                      "Login",
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 30,
+                            color: Colors.blue,
                           ),
-                    )
+                    ),
+                    const SizedBox(height: 34),
+                    TextField(
+                      controller: _usernameCtrl,
+                      readOnly: _loading,
+                      autocorrect: false,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Username',
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _passwordCtrl,
+                      readOnly: _loading,
+                      autocorrect: false,
+                      obscureText: true,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Password',
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Container(
+                      alignment: Alignment.centerRight,
+                      child: RichText(
+                        text: TextSpan(
+                          text: _isRegister
+                              ? "Have an account ? "
+                              : "Not have an account yet ? ",
+                          style: Theme.of(context).textTheme.bodyMedium,
+                          children: [
+                            TextSpan(
+                              text: _isRegister
+                                  ? " login here"
+                                  : " register here",
+                              recognizer:
+                                  _loading ? null : TapGestureRecognizer()
+                                    ?..onTap = () {
+                                      setState(() {
+                                        _isRegister = !_isRegister;
+                                      });
+                                    },
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    color: Colors.lightBlue,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _loading ? null : _auth,
+                        child: _loading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator.adaptive(),
+                              )
+                            : Text(_isRegister ? 'Register' : 'Login'),
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _loading ? null : _auth,
-                child: _loading
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator.adaptive(),
-                      )
-                    : Text(_isRegister ? 'Register' : 'Login'),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -123,9 +136,7 @@ class LoginScreenState extends State<LoginScreen> {
     try {
       final client = Provider.of<Client>(context, listen: false);
 
-      await client.checkHomeserver(
-        Uri.http("${_homeserverCtrl.text.trim()}:8008", ''),
-      );
+      await client.checkHomeserver(Uri.http("$_homeserver:8008", ''));
 
       if (_isRegister) {
         final deviceInfoPlugin = DeviceInfoPlugin();

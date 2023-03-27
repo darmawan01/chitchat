@@ -1,14 +1,15 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:matrix/matrix.dart';
 import 'package:chitchat/app.dart';
 import 'package:chitchat/models/event.dart';
 import 'package:chitchat/services/notification.dart';
 import 'package:chitchat/services/voip.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:matrix/matrix.dart';
 import 'package:path_provider/path_provider.dart';
 
 void main() async {

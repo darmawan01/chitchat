@@ -1,14 +1,7 @@
-import 'dart:developer';
-
 import 'package:chitchat/screens/history.dart';
-import 'package:chitchat/screens/login.dart';
 import 'package:chitchat/screens/profile.dart';
 import 'package:chitchat/screens/rooms.dart';
-import 'package:chitchat/utils/utils.dart';
-import 'package:chitchat/widgets/contacts_modal.dart';
 import 'package:flutter/material.dart';
-import 'package:matrix/matrix.dart';
-import 'package:provider/provider.dart';
 
 class BaseScreen extends StatefulWidget {
   const BaseScreen({super.key});
@@ -21,10 +14,10 @@ class _BaseScreenState extends State<BaseScreen> {
   final _pageCtrl = PageController(initialPage: 1);
   int _page = 1;
 
-  List<Widget> screens = const [
+  List<Widget> screens = [
     Center(child: HistoryScreen()),
-    Center(child: RoomsScreen()),
-    Center(child: ProfileScreen()),
+    const Center(child: RoomsScreen()),
+    const Center(child: ProfileScreen()),
   ];
 
   @override
@@ -46,37 +39,11 @@ class _BaseScreenState extends State<BaseScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: <Widget>[
-          PopupMenuButton<String>(
-            itemBuilder: (BuildContext context) {
-              return [
-                PopupMenuItem<String>(
-                  child: ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    horizontalTitleGap: 0,
-                    onTap: _contacts,
-                    leading: const Icon(Icons.contacts_rounded),
-                    title: const Text('Contract'),
-                  ),
-                ),
-                PopupMenuItem<String>(
-                  child: ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    horizontalTitleGap: 0,
-                    onTap: _logout,
-                    leading: const Icon(Icons.lock_outline),
-                    title: const Text('Logout'),
-                  ),
-                ),
-              ];
-            },
-          ),
-        ],
-      ),
-      body: PageView(
-        controller: _pageCtrl,
-        children: screens,
+      body: SafeArea(
+        child: PageView(
+          controller: _pageCtrl,
+          children: screens,
+        ),
       ),
       bottomNavigationBar: BottomAppBar(
         child: Padding(
@@ -128,29 +95,5 @@ class _BaseScreenState extends State<BaseScreen> {
         ),
       ),
     );
-  }
-
-  void _contacts() {
-    showTransparentModalBottomSheet(
-      context,
-      (context) => const ContactsModal(),
-    );
-  }
-
-  void _logout() async {
-    final client = Provider.of<Client>(context, listen: false);
-
-    try {
-      await client.logout();
-    } catch (e) {
-      log(e.toString());
-    }
-
-    Future.delayed(const Duration(milliseconds: 100), () {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-        (route) => false,
-      );
-    });
   }
 }
