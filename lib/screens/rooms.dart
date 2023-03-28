@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:chitchat/models/quick_call.dart';
 import 'package:chitchat/screens/room.dart';
 import 'package:chitchat/utils/utils.dart';
 import 'package:chitchat/widgets/incoming_call_modal.dart';
@@ -5,6 +8,7 @@ import 'package:chitchat/widgets/room_modal.dart';
 import 'package:chitchat/widgets/video_call_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:intl/intl.dart';
 import 'package:matrix/matrix.dart';
 import 'package:provider/provider.dart';
 
@@ -86,7 +90,79 @@ class RoomsScreenState extends State<RoomsScreen> {
                 itemCount: client.rooms.length,
                 itemBuilder: (context, i) {
                   final room = client.rooms[i];
-                  final myHost = client.userID?.split(":")[1];
+
+                  final lastEvent = room.lastEvent;
+                  if (lastEvent != null &&
+                      lastEvent.text.contains("signal") &&
+                      !lastEvent.redacted &&
+                      lastEvent.senderId != client.userID &&
+                      lastEvent.relationshipEventId == null) {
+                    final signal = QuickCall.fromJson(
+                      jsonDecode(lastEvent.calcLocalizedBodyFallback(
+                        const MatrixDefaultLocalizations(),
+                        hideReply: true,
+                      )),
+                    );
+
+                    return Slidable(
+                      endActionPane: ActionPane(
+                        motion: const ScrollMotion(),
+                        children: [
+                          SlidableAction(
+                            flex: 1,
+                            onPressed: (context) async {
+                              await room.sendTextEvent(
+                                  jsonEncode(
+                                    QuickCall(signal: QuickCallSignal.rejected)
+                                        .toJson(),
+                                  ),
+                                  inReplyTo: lastEvent);
+                            },
+                            foregroundColor: Colors.red,
+                            label: 'Reject',
+                          ),
+                          SlidableAction(
+                            flex: 1,
+                            onPressed: (context) async {
+                              await room.sendTextEvent(
+                                  jsonEncode(
+                                    QuickCall(signal: QuickCallSignal.accepted)
+                                        .toJson(),
+                                  ),
+                                  inReplyTo: lastEvent);
+                            },
+                            foregroundColor: Colors.blue,
+                            label: 'Accept',
+                          ),
+                        ],
+                      ),
+                      child: Card(
+                        child: Container(
+                          color: signal.isEmergencyCall
+                              ? Colors.red
+                              : Colors.yellow,
+                          child: ListTile(
+                            leading: Icon(
+                              signal.isEmergencyCall
+                                  ? Icons.emergency_outlined
+                                  : Icons.emoji_people_outlined,
+                              size: 35,
+                            ),
+                            title: Text(room.getLocalizedDisplayname()),
+                            subtitle: Text(
+                              DateFormat("m/d/yyyy h:mm a").format(
+                                lastEvent.originServerTs,
+                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(fontSize: 10),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }
 
                   return Slidable(
                     endActionPane: ActionPane(
@@ -138,9 +214,7 @@ class RoomsScreenState extends State<RoomsScreen> {
                         children: [
                           Expanded(
                             child: Text(
-                              room
-                                  .getLocalizedDisplayname()
-                                  .replaceAll(":$myHost", ""),
+                              room.getLocalizedDisplayname(),
                             ),
                           ),
                           if (room.notificationCount > 0)
@@ -163,7 +237,8 @@ class RoomsScreenState extends State<RoomsScreen> {
                         ],
                       ),
                       subtitle: Text(
-                        room.lastEvent?.text.isNotEmpty ?? false
+                        (lastEvent?.text.isNotEmpty ?? false) &&
+                                lastEvent?.relationshipEventId == null
                             ? room.lastEvent!.text
                             : 'No messages',
                         maxLines: 1,

@@ -1,13 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:chitchat/app.dart';
-import 'package:chitchat/models/event.dart';
+import 'package:chitchat/models/quick_call.dart';
+// import 'package:chitchat/models/event.dart';
 import 'package:chitchat/services/notification.dart';
 import 'package:chitchat/services/voip.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:matrix/matrix.dart';
 import 'package:path_provider/path_provider.dart';
@@ -31,12 +32,29 @@ void main() async {
   await client.init();
 
   client.onEvent.stream.listen((event) {
-    final e = Events.fromJson(event.content);
+    final room = client.getRoomById(event.roomID);
+    final e = Event.fromJson(event.content, room!);
 
-    if (e.sender != client.userID && e.isEventMessage) {
+    if (e.senderId != client.userID && e.type == EventTypes.Message) {
+      var body = e.calcLocalizedBodyFallback(
+        const MatrixDefaultLocalizations(),
+        hideReply: true,
+      );
+
+      if (e.text.contains("signal")) {
+        final signal = QuickCall.fromJson(
+          jsonDecode(e.calcLocalizedBodyFallback(
+            const MatrixDefaultLocalizations(),
+            hideReply: true,
+          )),
+        );
+
+        body = signal.toMessage(e.senderFromMemoryOrFallback.calcDisplayname());
+      }
+
       FlutterBackgroundService().invoke(
         "message",
-        {"title": e.sender, "body": e.content?.body ?? ""},
+        {"title": e.senderFromMemoryOrFallback.calcDisplayname(), "body": body},
       );
 
       // if (Platform.isIOS) {

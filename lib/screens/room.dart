@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:chitchat/models/event.dart';
+import 'package:chitchat/models/quick_call.dart';
+import 'package:chitchat/utils/consts.dart';
 import 'package:chitchat/utils/utils.dart';
 import 'package:chitchat/widgets/incoming_call_modal.dart';
 import 'package:chitchat/widgets/outgoing_call_modal.dart';
@@ -45,6 +48,7 @@ class RoomScreenState extends State<RoomScreen> {
   Widget messageItem(Event event, Timeline timeline, bool isMe) {
     final isAvatarAvailable =
         event.senderFromMemoryOrFallback.avatarUrl != null;
+
     final avatar = CircleAvatar(
       foregroundImage: isAvatarAvailable
           ? NetworkImage(
@@ -77,9 +81,7 @@ class RoomScreenState extends State<RoomScreen> {
     );
 
     final time = Text(
-      DateFormat("m/d/yyyy h:mm a").format(
-        event.originServerTs,
-      ),
+      formatSinceTime(event.originServerTs.millisecondsSinceEpoch ~/ 1000),
       style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 10),
     );
 
@@ -106,7 +108,7 @@ class RoomScreenState extends State<RoomScreen> {
                     case "C":
                       Clipboard.setData(
                         ClipboardData(
-                          text: event.getDisplayEvent(timeline).body,
+                          text: event.text,
                         ),
                       );
                       break;
@@ -128,7 +130,7 @@ class RoomScreenState extends State<RoomScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        event.getDisplayEvent(timeline).text,
+                        event.text,
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       const SizedBox(height: 12),
@@ -247,11 +249,12 @@ class RoomScreenState extends State<RoomScreen> {
             stream: client.onEvent.stream,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                final e = Events.fromJson(snapshot.data!.content);
+                final e = Event.fromJson(snapshot.data!.content, widget.room);
+                final c = EventContent.fromJson(e.content);
 
-                if (e.isTypingEvent &&
-                    e.content!.userIds!.isNotEmpty &&
-                    !e.content!.userIds!.contains(client.userID)) {
+                if (e.type == eventTyping &&
+                    (c.userIds?.isNotEmpty ?? false) &&
+                    !(c.userIds?.contains(client.userID) ?? false)) {
                   return Padding(
                     padding: EdgeInsets.only(
                         left: MediaQuery.of(context).size.width * .12,
@@ -259,7 +262,7 @@ class RoomScreenState extends State<RoomScreen> {
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "${e.content?.cleanedUserIds} is typing...",
+                        "${c.cleanedUserIds} is typing...",
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
                               color: Colors.white,
                             ),
@@ -418,32 +421,16 @@ class RoomScreenState extends State<RoomScreen> {
 
                                   if (event.type == EventTypes.CallInvite &&
                                       event.senderId != client.userID) {
-                                    return Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 6.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          const Icon(
-                                            Icons.phone_missed,
-                                            size: 24,
-                                            color: Colors.red,
-                                          ),
-                                          const SizedBox(width: 6.0),
-                                          Text(
-                                              "Missed call from ${event.senderFromMemoryOrFallback.calcDisplayname()}"),
-                                        ],
-                                      ),
-                                    );
+                                    return missedCall(event);
                                   }
 
-                                  return event.relationshipEventId != null ||
+                                  final hideEvent =
+                                      event.relationshipEventId != null ||
                                           event.redacted ||
-                                          event
-                                              .getDisplayEvent(timeline)
-                                              .text
-                                              .isEmpty
+                                          event.text.isEmpty ||
+                                          event.text.contains("signal");
+
+                                  return hideEvent
                                       ? Container()
                                       : ScaleTransition(
                                           scale: animation,
@@ -466,29 +453,7 @@ class RoomScreenState extends State<RoomScreen> {
                     },
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 16,
-                    right: 16,
-                    bottom: 8,
-                    top: 8,
-                  ),
-                  child: Wrap(
-                    spacing: 8,
-                    children: [
-                      _quickMessage(
-                          label: "Emergency",
-                          color: Colors.red,
-                          onClick: () {},
-                          icon: const Icon(Icons.emergency_outlined)),
-                      _quickMessage(
-                          label: "Help",
-                          color: Colors.yellow,
-                          onClick: () {},
-                          icon: const Icon(Icons.emoji_people_outlined)),
-                    ],
-                  ),
-                ),
+                if (widget.room.isDirectChat) _quicCallOptions(),
                 const Divider(height: 1),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -531,6 +496,36 @@ class RoomScreenState extends State<RoomScreen> {
     _sendController.clear();
   }
 
+  Widget _quicCallOptions() {
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 16,
+        right: 16,
+        bottom: 8,
+        top: 8,
+      ),
+      child: Wrap(
+        spacing: 8,
+        children: [
+          _quickMessage(
+            label: "Emergency",
+            color: Colors.red,
+            onClick: () => _quickCall(QuickCallSignal.emergency),
+            icon: const Icon(
+              Icons.emergency_outlined,
+            ),
+          ),
+          _quickMessage(
+            label: "Help",
+            color: Colors.yellow,
+            onClick: () => _quickCall(QuickCallSignal.help),
+            icon: const Icon(Icons.emoji_people_outlined),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _quickMessage({
     required Color color,
     required String label,
@@ -550,11 +545,73 @@ class RoomScreenState extends State<RoomScreen> {
               icon,
               Text(
                 label,
-                style: Theme.of(context).textTheme.bodyMedium,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
               )
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  _quickCall(QuickCallSignal signal) async {
+    await widget.room.sendTextEvent(
+      jsonEncode(QuickCall(signal: signal).toJson()),
+    );
+
+    Future.delayed(const Duration(milliseconds: 500), () {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return Dialog(
+            backgroundColor: signal == QuickCallSignal.emergency
+                ? Colors.red
+                : Colors.yellow,
+            child: SizedBox(
+              height: 60,
+              width: 60,
+              child: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: const Icon(
+                  Icons.close,
+                  size: 50,
+                ),
+              ),
+            ),
+          );
+        },
+      ).then((value) {
+        widget.room.sendTextEvent(
+          jsonEncode(
+            QuickCall(signal: QuickCallSignal.canceled),
+          ),
+          inReplyTo: widget.room.lastEvent,
+        );
+      });
+    });
+  }
+
+  Widget missedCall(Event event) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.phone_missed,
+            size: 24,
+            color: Colors.red,
+          ),
+          const SizedBox(width: 6.0),
+          Text(
+            "Missed call from ${event.senderFromMemoryOrFallback.calcDisplayname()}",
+          ),
+        ],
       ),
     );
   }

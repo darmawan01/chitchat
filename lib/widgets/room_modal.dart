@@ -67,7 +67,8 @@ class CreateRoomBottomSheetState extends State<CreateRoomBottomSheet> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              if (!(widget.direct ?? false)) ...[
+              if (!(widget.direct ?? false) &&
+                  widget.type != SheetType.invite) ...[
                 const SizedBox(height: 16.0),
                 Row(
                   children: [
@@ -99,7 +100,8 @@ class CreateRoomBottomSheetState extends State<CreateRoomBottomSheet> {
                             case SheetType.room:
                               if (widget.direct ?? false) {
                                 await client.startDirectChat(
-                                    "${_controller.text.trim()}:$myHost");
+                                  "${_controller.text.trim()}:$myHost",
+                                );
                               } else {
                                 await client.createRoom(
                                   name: "${_controller.text.trim()}:$myHost",

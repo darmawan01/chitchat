@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 Future showTransparentModalBottomSheet(
   BuildContext context,
@@ -66,4 +67,21 @@ Future showConfirmDialog(
       );
     },
   );
+}
+
+String formatSinceTime(int unixTime) {
+  final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+  final diff = now - unixTime;
+  if (diff < 60) {
+    return '$diff seconds ago';
+  } else if (diff < 3600) {
+    final minutes = (diff ~/ 60).toString();
+    return '$minutes minutes ago';
+  } else if (diff < 86400) {
+    final hours = (diff ~/ 3600).toString();
+    return '$hours hours ago';
+  } else {
+    final date = DateTime.fromMillisecondsSinceEpoch(unixTime * 1000);
+    return DateFormat('MMM dd, yyyy h:mm a').format(date);
+  }
 }

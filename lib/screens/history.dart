@@ -1,66 +1,126 @@
+import 'dart:convert';
+
+import 'package:chitchat/models/quick_call.dart';
+import 'package:chitchat/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:matrix/matrix.dart';
+import 'package:provider/provider.dart';
 
-final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-const hoursAgo = 3;
-final timestamp = now - (hoursAgo * 3600);
+class HistoryScreen extends StatefulWidget {
+  const HistoryScreen({super.key});
 
-class HistoryScreen extends StatelessWidget {
-  HistoryScreen({super.key});
+  @override
+  State<HistoryScreen> createState() => _HistoryScreenState();
+}
 
-  final List<Map<String, dynamic>> callList = [
-    {
-      'callerName': 'John Doe',
-      'callerAvatar': 'https://picsum.photos/id/237/200/300',
-      'callTime': timestamp,
-    },
-    {
-      'callerName': 'Jane Doe',
-      'callerAvatar': 'https://picsum.photos/id/237/200/300',
-      'callTime': timestamp,
-    },
-    {
-      'callerName': 'Jim Doe',
-      'callerAvatar': 'https://picsum.photos/id/237/200/300',
-      'callTime': timestamp,
-    },
-  ];
-
-  String _formatCallTime(int unixTime) {
-    final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    final diff = now - unixTime;
-    if (diff < 60) {
-      return '$diff seconds ago';
-    } else if (diff < 3600) {
-      final minutes = (diff ~/ 60).toString();
-      return '$minutes minutes ago';
-    } else if (diff < 86400) {
-      final hours = (diff ~/ 3600).toString();
-      return '$hours hours ago';
-    } else {
-      final date = DateTime.fromMillisecondsSinceEpoch(unixTime * 1000);
-      return DateFormat('MMM dd, yyyy').format(date);
-    }
+class _HistoryScreenState extends State<HistoryScreen> {
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: callList.length,
-      itemBuilder: (BuildContext context, int index) {
-        final callTime =
-            _formatCallTime(int.parse(callList[index]['callTime'].toString()));
-        return Card(
-          child: ListTile(
-            leading: CircleAvatar(
-              radius: 30.0,
-              backgroundImage: NetworkImage(callList[index]['callerAvatar']),
+    final client = Provider.of<Client>(context, listen: false);
+
+    return Scaffold(
+      body: Column(
+        children: [
+          Expanded(
+            child: StreamBuilder(
+              stream: client.onSync.stream,
+              builder: (context, _) => ListView.builder(
+                itemCount: client.rooms.length,
+                itemBuilder: (context, i) {
+                  final room = client.rooms[i];
+
+                  return FutureBuilder<Timeline>(
+                    future: room.getTimeline(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return Container();
+                      }
+
+                      final events = snapshot.data?.events;
+
+                      final signals = events
+                          ?.where(
+                            (item) =>
+                                item.text.contains("signal") &&
+                                item.senderId != client.userID,
+                          )
+                          .toList();
+
+                      if (signals == null || signals.isEmpty) {
+                        return SizedBox(
+                          height: MediaQuery.of(context).size.height * .75,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              IconButton(
+                                onPressed: room.requestHistory,
+                                icon: const Icon(Icons.refresh),
+                              ),
+                              const Text("No data !")
+                            ],
+                          ),
+                        );
+                      }
+
+                      return ListView.builder(
+                        itemCount: signals.length,
+                        shrinkWrap: true,
+                        primary: true,
+                        scrollDirection: Axis.vertical,
+                        physics: const ScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          final event = signals[index];
+                          final signal = QuickCall.fromJson(
+                            jsonDecode(
+                              event.calcLocalizedBodyFallback(
+                                const MatrixDefaultLocalizations(),
+                                hideReply: true,
+                              ),
+                            ),
+                          );
+
+                          return Card(
+                            child: Container(
+                              color: signal.isEmergencyCall
+                                  ? Colors.red
+                                  : Colors.yellow,
+                              child: ListTile(
+                                leading: Icon(
+                                  signal.isEmergencyCall
+                                      ? Icons.emergency_outlined
+                                      : Icons.emoji_people_outlined,
+                                  size: 35,
+                                ),
+                                title: Text(room.getLocalizedDisplayname()),
+                                subtitle: Text(
+                                  formatSinceTime(
+                                    event.originServerTs
+                                            .millisecondsSinceEpoch ~/
+                                        1000,
+                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(fontSize: 10),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
-            title: Text(callList[index]['callerName']),
-            subtitle: Text(callTime),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 }

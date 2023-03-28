@@ -15,7 +15,7 @@ class _BaseScreenState extends State<BaseScreen> {
   int _page = 1;
 
   List<Widget> screens = [
-    Center(child: HistoryScreen()),
+    const Center(child: HistoryScreen()),
     const Center(child: RoomsScreen()),
     const Center(child: ProfileScreen()),
   ];
@@ -52,23 +52,27 @@ class _BaseScreenState extends State<BaseScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               IconButton(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
                 onPressed: () {
                   _pageCtrl.jumpToPage(0);
                 },
                 icon: Icon(
                   Icons.history,
                   size: 30,
-                  color: _page == 0 ? Colors.blueAccent : Colors.black,
+                  color: _page == 0 ? Colors.blueAccent : Colors.black45,
                 ),
               ),
               IconButton(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
                 onPressed: () {
                   _pageCtrl.jumpToPage(2);
                 },
                 icon: Icon(
                   Icons.person_2_outlined,
                   size: 30,
-                  color: _page == 2 ? Colors.blueAccent : Colors.black,
+                  color: _page == 2 ? Colors.blueAccent : Colors.black45,
                 ),
               ),
             ],
@@ -77,6 +81,7 @@ class _BaseScreenState extends State<BaseScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: InkWell(
+        enableFeedback: false,
         onTap: () {
           _pageCtrl.jumpToPage(1);
         },
@@ -84,7 +89,7 @@ class _BaseScreenState extends State<BaseScreen> {
           height: 70,
           width: 70,
           decoration: BoxDecoration(
-            color: _page == 1 ? Colors.blueAccent : Colors.black,
+            color: _page == 1 ? Colors.blueAccent : Colors.grey,
             shape: BoxShape.circle,
           ),
           child: const Icon(

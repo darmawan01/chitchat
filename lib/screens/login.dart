@@ -1,5 +1,7 @@
+import 'dart:io';
+
 import 'package:chitchat/screens/base.dart';
-import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
@@ -78,7 +80,7 @@ class LoginScreenState extends State<LoginScreen> {
                         text: TextSpan(
                           text: _isRegister
                               ? "Have an account ? "
-                              : "Not have an account yet ? ",
+                              : "New account ? ",
                           style: Theme.of(context).textTheme.bodyMedium,
                           children: [
                             TextSpan(
@@ -139,23 +141,24 @@ class LoginScreenState extends State<LoginScreen> {
       await client.checkHomeserver(Uri.http("$_homeserver:8008", ''));
 
       if (_isRegister) {
-        final deviceInfoPlugin = DeviceInfoPlugin();
-        final deviceInfo = await deviceInfoPlugin.deviceInfo;
-
         await client.register(
-          username: _usernameCtrl.text,
-          password: _passwordCtrl.text,
-          auth: AuthenticationData(type: AuthenticationTypes.dummy),
-          deviceId: deviceInfo.data.tryGet("model"),
-          kind: AccountKind.user,
-        );
+            username: _usernameCtrl.text,
+            password: _passwordCtrl.text,
+            auth: AuthenticationData(type: AuthenticationTypes.dummy),
+            initialDeviceDisplayName:
+                'ChitChat ${Platform.operatingSystem}${kReleaseMode ? '' : 'Debug'}');
       } else {
-        await client.login(
-          LoginType.mLoginPassword,
-          password: _passwordCtrl.text,
-          identifier: AuthenticationUserIdentifier(user: _usernameCtrl.text),
-        );
+        await client.login(LoginType.mLoginPassword,
+            password: _passwordCtrl.text,
+            identifier: AuthenticationUserIdentifier(user: _usernameCtrl.text),
+            initialDeviceDisplayName:
+                'ChitChat ${Platform.operatingSystem}${kReleaseMode ? '' : 'Debug'}');
       }
+
+      await client.setDisplayName(
+        client.userID!,
+        _usernameCtrl.text,
+      );
 
       Future.delayed(const Duration(milliseconds: 100), () {
         Navigator.of(context).pushAndRemoveUntil(
