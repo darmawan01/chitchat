@@ -41,6 +41,7 @@ void main() async {
         hideReply: true,
       );
 
+      String quickSignal = "";
       if (e.text.contains("signal")) {
         final signal = QuickCall.fromJson(
           jsonDecode(e.calcLocalizedBodyFallback(
@@ -50,18 +51,23 @@ void main() async {
         );
 
         body = signal.toMessage(e.senderFromMemoryOrFallback.calcDisplayname());
+        quickSignal = signal.signal.toString();
       }
 
       FlutterBackgroundService().invoke(
         "message",
-        {"title": e.senderFromMemoryOrFallback.calcDisplayname(), "body": body},
+        {
+          "title": e.senderFromMemoryOrFallback.calcDisplayname(),
+          "body": body,
+          "quickSignal": quickSignal
+        },
       );
 
       // if (Platform.isIOS) {
-      //   NotificationService().showNotification(
-      //     title: e.sender,
-      //     body: e.content?.body ?? "",
-      //   );
+      // NotificationService().showNotification(
+      //   title: e.senderFromMemoryOrFallback.calcDisplayname(),
+      //   body: body,
+      // );
       // }
     }
   });
@@ -82,6 +88,8 @@ Future<void> initializeService() async {
       onStart: onStart,
       autoStart: true,
       isForegroundMode: true,
+      initialNotificationTitle: "ChitChat Service",
+      initialNotificationContent: 'Listen the ChitChat Notifications',
     ),
     iosConfiguration: IosConfiguration(
       autoStart: true,
@@ -102,6 +110,7 @@ Future<bool> onIosBackground(ServiceInstance service) async {
     NotificationService().showNotification(
       title: event?["title"],
       body: event?["body"],
+      signal: event?["quickSignal"],
     );
   });
 
@@ -116,6 +125,7 @@ void onStart(ServiceInstance service) async {
     NotificationService().showNotification(
       title: event?["title"],
       body: event?["body"],
+      signal: event?["quickSignal"],
     );
   });
 }

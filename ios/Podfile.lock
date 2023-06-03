@@ -13,14 +13,16 @@ PODS:
   - flutter_openssl_crypto (0.0.1):
     - Flutter
     - OpenSSL-Universal
-  - flutter_webrtc (0.9.20):
+  - flutter_webrtc (0.9.31):
     - Flutter
-    - WebRTC-SDK (= 104.5112.09)
-  - OpenSSL-Universal (1.1.1900)
+    - WebRTC-SDK (= 104.5112.17)
+  - OpenSSL-Universal (1.1.2000)
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - WebRTC-SDK (104.5112.09)
+  - permission_handler_apple (9.0.4):
+    - Flutter
+  - WebRTC-SDK (104.5112.17)
 
 DEPENDENCIES:
   - audioplayers_darwin (from `.symlinks/plugins/audioplayers_darwin/ios`)
@@ -32,6 +34,7 @@ DEPENDENCIES:
   - flutter_openssl_crypto (from `.symlinks/plugins/flutter_openssl_crypto/ios`)
   - flutter_webrtc (from `.symlinks/plugins/flutter_webrtc/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/ios`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
 
 SPEC REPOS:
   trunk:
@@ -57,6 +60,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_webrtc/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/ios"
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
 
 SPEC CHECKSUMS:
   audioplayers_darwin: 877d9a4d06331c5c374595e46e16453ac7eafa40
@@ -66,10 +71,11 @@ SPEC CHECKSUMS:
   flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
   flutter_olm: eabfc68eaedfff3b6a61314196922049df3e7dac
   flutter_openssl_crypto: 636ad25f56fbe0f45b9e13b8589540b341a486a1
-  flutter_webrtc: 15c5fb4ea324f3178ff97c0f02b9467b85977e42
-  OpenSSL-Universal: 84efb8a29841f2764ac5403e0c4119a28b713346
+  flutter_webrtc: 02c023207f972145a3bc8c7aada86754f264d563
+  OpenSSL-Universal: 708e3d1e616a2c40f09a880aafc4b14d2f2a61ec
   path_provider_foundation: c68054786f1b4f3343858c1e1d0caaded73f0be9
-  WebRTC-SDK: 3fa5c6fa717314fade68bffed85737484a28ad0b
+  permission_handler_apple: 44366e37eaf29454a1e7b1b7d736c2cceaeb17ce
+  WebRTC-SDK: 082ae4893212534a779ca233f19a9df8efd5f3bd
 
 PODFILE CHECKSUM: 5e8edfb831c980c61cec526e4d6a5a423f6108a4
 

@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:chitchat/models/event.dart';
 import 'package:chitchat/models/quick_call.dart';
-import 'package:chitchat/utils/consts.dart';
 import 'package:chitchat/utils/utils.dart';
 import 'package:chitchat/widgets/incoming_call_modal.dart';
 import 'package:chitchat/widgets/outgoing_call_modal.dart';
@@ -249,12 +248,11 @@ class RoomScreenState extends State<RoomScreen> {
             stream: client.onEvent.stream,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                final e = Event.fromJson(snapshot.data!.content, widget.room);
-                final c = EventContent.fromJson(e.content);
+                final e = Events.fromJson(snapshot.data!.content);
 
-                if (e.type == eventTyping &&
-                    (c.userIds?.isNotEmpty ?? false) &&
-                    !(c.userIds?.contains(client.userID) ?? false)) {
+                if (e.isTypingEvent &&
+                    e.content!.userIds!.isNotEmpty &&
+                    !e.content!.userIds!.contains(client.userID)) {
                   return Padding(
                     padding: EdgeInsets.only(
                         left: MediaQuery.of(context).size.width * .12,
@@ -262,7 +260,7 @@ class RoomScreenState extends State<RoomScreen> {
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "${c.cleanedUserIds} is typing...",
+                        "${e.content?.cleanedUserIds} is typing...",
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
                               color: Colors.white,
                             ),
@@ -415,7 +413,6 @@ class RoomScreenState extends State<RoomScreen> {
                                       event.roomId!,
                                       ReceiptType.mRead,
                                       event.eventId,
-                                      {},
                                     );
                                   }
 
@@ -493,6 +490,7 @@ class RoomScreenState extends State<RoomScreen> {
 
   void _send() {
     widget.room.sendTextEvent(_sendController.text.trim());
+
     _sendController.clear();
   }
 
@@ -572,7 +570,7 @@ class RoomScreenState extends State<RoomScreen> {
                 : Colors.yellow,
             child: SizedBox(
               height: 60,
-              width: 60,
+              width: 40,
               child: IconButton(
                 onPressed: () {
                   Navigator.pop(context);
@@ -580,6 +578,7 @@ class RoomScreenState extends State<RoomScreen> {
                 icon: const Icon(
                   Icons.close,
                   size: 50,
+                  color: Colors.white,
                 ),
               ),
             ),

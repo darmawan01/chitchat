@@ -9,25 +9,19 @@ class VoipService implements WebRTCDelegate {
   final player = AudioPlayer();
 
   @override
-  void handleCallEnded(CallSession session) {}
+  Future<void> handleCallEnded(CallSession session) async {}
 
   @override
   bool get canHandleNewCall => true;
 
   @override
-  void handleGroupCallEnded(GroupCall groupCall) {
-    // TODO: implement handleGroupCallEnded
-  }
+  Future<void> handleGroupCallEnded(GroupCall groupCall) async {}
 
   @override
-  void handleMissedCall(CallSession session) {
-    // TODO: implement handleMissedCall
-  }
+  Future<void> handleMissedCall(CallSession session) async {}
 
   @override
-  void handleNewGroupCall(GroupCall groupCall) {
-    // TODO: implement handleNewGroupCall
-  }
+  Future<void> handleNewGroupCall(GroupCall groupCall) async {}
 
   @override
   bool get isWeb => kIsWeb;
@@ -62,10 +56,12 @@ class VoipService implements WebRTCDelegate {
   MediaDevices get mediaDevices => webrtc_impl.navigator.mediaDevices;
 
   @override
-  void playRingtone() {}
+  Future<void> playRingtone() async {
+    // throw UnimplementedError();
+  }
 
   @override
-  void stopRingtone() {
-    player.stop();
+  Future<void> stopRingtone() async {
+    await player.stop();
   }
 }

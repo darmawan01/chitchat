@@ -115,7 +115,7 @@ class CreateRoomBottomSheetState extends State<CreateRoomBottomSheet> {
                               await client.inviteUser(
                                 widget.roomId!,
                                 "${_controller.text.trim()}:$myHost",
-                                reason: "Let's have a talk",
+                                reason: "Let's have a chat",
                               );
                               break;
                             default:
