@@ -1,4 +1,8 @@
-import 'package:chitchat/utils/consts.dart';
+import 'package:matrix/matrix.dart';
+
+class EventsTypes {
+  static const String Typing = "m.typing";
+}
 
 class Events {
   String? type;
@@ -27,9 +31,9 @@ class Events {
     status = json['status'];
   }
 
-  get isEventMessage => type == eventMessage;
+  get isEventMessage => type == EventTypes.Message;
 
-  get isTypingEvent => type == eventTyping;
+  get isTypingEvent => type == EventsTypes.Typing;
 }
 
 class Content {

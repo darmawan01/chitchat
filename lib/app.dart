@@ -1,17 +1,16 @@
-import 'package:chitchat/common/theme/default.dart';
-import 'package:chitchat/screens/splash.dart';
+import 'package:aptus_aware/common/theme/default.dart';
+import 'package:aptus_aware/screens/splash.dart';
+import 'package:aptus_aware/services/voip.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:matrix/matrix.dart';
 import 'package:provider/provider.dart';
 
-class ChitChatApp extends StatelessWidget {
+class AptusAwareApp extends StatelessWidget {
   final Client client;
-  final VoIP voip;
 
-  const ChitChatApp({
+  const AptusAwareApp({
     required this.client,
-    required this.voip,
     Key? key,
   }) : super(key: key);
 
@@ -24,13 +23,15 @@ class ChitChatApp extends StatelessWidget {
       systemNavigationBarIconBrightness: Brightness.dark,
     ));
 
+    final voip = VoIP(client, VoipService());
+
     return MultiProvider(
       providers: [
         Provider<Client>(create: (context) => client),
         Provider<VoIP>(create: (context) => voip),
       ],
       child: MaterialApp(
-        title: 'ChitChat',
+        title: 'AptusAware',
         theme: defaultTheme(context),
         debugShowCheckedModeBanner: false,
         home: SplashScreen(client: client),

@@ -1,8 +1,8 @@
 import 'dart:developer';
 
-import 'package:chitchat/screens/login.dart';
-import 'package:chitchat/utils/utils.dart';
-import 'package:chitchat/widgets/contacts_modal.dart';
+import 'package:aptus_aware/screens/login.dart';
+import 'package:aptus_aware/utils/utils.dart';
+import 'package:aptus_aware/widgets/contacts_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 import 'package:provider/provider.dart';

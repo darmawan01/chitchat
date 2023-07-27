@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:chitchat/models/quick_call.dart';
-import 'package:chitchat/utils/utils.dart';
+import 'package:aptus_aware/models/quick_call.dart';
+import 'package:aptus_aware/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 import 'package:provider/provider.dart';

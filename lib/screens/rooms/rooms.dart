@@ -1,16 +1,18 @@
 import 'dart:convert';
 
-import 'package:chitchat/models/quick_call.dart';
-import 'package:chitchat/screens/room.dart';
-import 'package:chitchat/utils/utils.dart';
-import 'package:chitchat/widgets/incoming_call_modal.dart';
-import 'package:chitchat/widgets/room_modal.dart';
-import 'package:chitchat/widgets/video_call_modal.dart';
+import 'package:aptus_aware/models/quick_call.dart';
+import 'package:aptus_aware/utils/consts.dart';
+import 'package:aptus_aware/utils/utils.dart';
+import 'package:aptus_aware/widgets/incoming_call_modal.dart';
+import 'package:aptus_aware/widgets/room_modal.dart';
+import 'package:aptus_aware/widgets/video_call_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:matrix/matrix.dart';
 import 'package:provider/provider.dart';
+
+import './room.dart';
 
 class RoomsScreen extends StatefulWidget {
   const RoomsScreen({Key? key}) : super(key: key);
@@ -53,7 +55,7 @@ class RoomsScreenState extends State<RoomsScreen> {
             height: 35,
             decoration: const BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: Colors.blue),
+                bottom: BorderSide(color: Colorized.primary),
               ),
             ),
             padding: const EdgeInsets.only(left: 16, right: 16),
@@ -67,7 +69,7 @@ class RoomsScreenState extends State<RoomsScreen> {
                     style: Theme.of(context)
                         .textTheme
                         .bodyMedium
-                        ?.copyWith(color: Colors.blue),
+                        ?.copyWith(color: Colorized.primary),
                   ),
                 ),
                 TextButton(
@@ -77,7 +79,7 @@ class RoomsScreenState extends State<RoomsScreen> {
                     style: Theme.of(context)
                         .textTheme
                         .bodyMedium
-                        ?.copyWith(color: Colors.blue),
+                        ?.copyWith(color: Colorized.primary),
                   ),
                 )
               ],
@@ -131,7 +133,7 @@ class RoomsScreenState extends State<RoomsScreen> {
                                   ),
                                   inReplyTo: lastEvent);
                             },
-                            foregroundColor: Colors.blue,
+                            foregroundColor: Colorized.primary,
                             label: 'Accept',
                           ),
                         ],

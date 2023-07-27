@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:chitchat/models/event.dart';
-import 'package:chitchat/models/quick_call.dart';
-import 'package:chitchat/utils/utils.dart';
-import 'package:chitchat/widgets/incoming_call_modal.dart';
-import 'package:chitchat/widgets/outgoing_call_modal.dart';
-import 'package:chitchat/widgets/room_modal.dart';
-import 'package:chitchat/widgets/video_call_modal.dart';
+import 'package:aptus_aware/models/event.dart';
+import 'package:aptus_aware/models/quick_call.dart';
+import 'package:aptus_aware/utils/utils.dart';
+import 'package:aptus_aware/widgets/incoming_call_modal.dart';
+import 'package:aptus_aware/widgets/outgoing_call_modal.dart';
+import 'package:aptus_aware/widgets/room_modal.dart';
+import 'package:aptus_aware/widgets/video_call_modal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -608,7 +608,7 @@ class RoomScreenState extends State<RoomScreen> {
           ),
           const SizedBox(width: 6.0),
           Text(
-            "Missed call from ${event.senderFromMemoryOrFallback.calcDisplayname()}",
+            "Call from ${event.senderFromMemoryOrFallback.calcDisplayname()}",
           ),
         ],
       ),

@@ -33,7 +33,7 @@ DEPENDENCIES:
   - flutter_olm (from `.symlinks/plugins/flutter_olm/ios`)
   - flutter_openssl_crypto (from `.symlinks/plugins/flutter_openssl_crypto/ios`)
   - flutter_webrtc (from `.symlinks/plugins/flutter_webrtc/ios`)
-  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
 
 SPEC REPOS:
@@ -59,7 +59,7 @@ EXTERNAL SOURCES:
   flutter_webrtc:
     :path: ".symlinks/plugins/flutter_webrtc/ios"
   path_provider_foundation:
-    :path: ".symlinks/plugins/path_provider_foundation/ios"
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
 
@@ -79,4 +79,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 5e8edfb831c980c61cec526e4d6a5a423f6108a4
 
-COCOAPODS: 1.12.0
+COCOAPODS: 1.12.1

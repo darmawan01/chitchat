@@ -1,2 +1,5 @@
-const eventMessage = "m.room.message";
-const eventTyping = "m.typing";
+import 'package:flutter/cupertino.dart';
+
+abstract class Colorized {
+  static const Color primary = Color.fromRGBO(43, 116, 173, 1);
+}

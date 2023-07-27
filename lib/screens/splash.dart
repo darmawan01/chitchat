@@ -1,7 +1,7 @@
+import 'package:aptus_aware/screens/base.dart';
+import 'package:aptus_aware/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
-import 'package:chitchat/screens/login.dart';
-import 'package:chitchat/screens/base.dart';
 
 class SplashScreen extends StatefulWidget {
   final Client client;
@@ -14,8 +14,9 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    _init();
     super.initState();
+
+    _init();
   }
 
   _init() {
@@ -41,18 +42,13 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.chat_outlined,
-              size: 65,
-              color: Colors.blue,
+            Container(
+              height: 120,
+              width: 120,
+              decoration: const BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage("assets/images/aptus-logo.png"))),
             ),
-            const SizedBox(height: 16),
-            Text(
-              "ChitChat",
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            )
           ],
         ),
       ),

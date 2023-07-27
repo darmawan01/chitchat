@@ -1,11 +1,14 @@
-import 'dart:io';
+import "dart:developer";
+import "dart:io";
 
-import 'package:chitchat/screens/base.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
-import 'package:matrix/matrix.dart';
-import 'package:provider/provider.dart';
+import "package:aptus_aware/screens/base.dart";
+import "package:aptus_aware/utils/consts.dart";
+import "package:flutter/foundation.dart";
+import "package:flutter/gestures.dart";
+import "package:flutter/material.dart";
+import "package:flutter_background/flutter_background.dart";
+import "package:matrix/matrix.dart";
+import "package:provider/provider.dart";
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -15,7 +18,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class LoginScreenState extends State<LoginScreen> {
-  final _homeserver = "3.27.93.95";
+  final _homeserver = "ec2-3-27-93-95.ap-southeast-2.compute.amazonaws.com";
   final _usernameCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
 
@@ -25,6 +28,56 @@ class LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
+
+    if (Platform.isAndroid) {
+      initBackgroundServices(context);
+    }
+  }
+
+  initBackgroundServices(BuildContext context) async {
+    const config = FlutterBackgroundAndroidConfig(
+      notificationTitle: "AptusAware Background Service",
+      notificationText:
+          "Background notification for keeping the AptusAware app running in the background",
+      notificationImportance: AndroidNotificationImportance.Default,
+      notificationIcon: AndroidResource(name: 'ic_launcher', defType: 'mipmap'),
+      enableWifiLock: true,
+      showBadge: true,
+      shouldRequestBatteryOptimizationsOff: true,
+    );
+
+    bool hasPermission = await FlutterBackground.hasPermissions;
+    if (!hasPermission) {
+      Future.delayed(const Duration(milliseconds: 300), () async {
+        await showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text("Permissions needed"),
+              content: const Text(
+                "Shortly the OS will ask you for permission to execute this app in the background. This is required in order to receive chat messages when the app is not in the foreground.",
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, "OK"),
+                  child: const Text("OK"),
+                ),
+              ],
+            );
+          },
+        );
+      });
+    }
+
+    hasPermission = await FlutterBackground.initialize(
+      androidConfig: config,
+    );
+
+    if (hasPermission) await FlutterBackground.enableBackgroundExecution();
+
+    if (FlutterBackground.isBackgroundExecutionEnabled) {
+      log("Background are running...");
+    }
   }
 
   @override
@@ -49,7 +102,7 @@ class LoginScreenState extends State<LoginScreen> {
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.w900,
                             fontSize: 30,
-                            color: Colors.blue,
+                            color: Colorized.primary,
                           ),
                     ),
                     const SizedBox(height: 34),
@@ -59,7 +112,7 @@ class LoginScreenState extends State<LoginScreen> {
                       autocorrect: false,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
-                        labelText: 'Username',
+                        labelText: "Username",
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -70,7 +123,7 @@ class LoginScreenState extends State<LoginScreen> {
                       obscureText: true,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
-                        labelText: 'Password',
+                        labelText: "Password",
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -111,13 +164,16 @@ class LoginScreenState extends State<LoginScreen> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: _loading ? null : _auth,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colorized.primary,
+                        ),
                         child: _loading
                             ? const SizedBox(
                                 width: 24,
                                 height: 24,
                                 child: CircularProgressIndicator.adaptive(),
                               )
-                            : Text(_isRegister ? 'Register' : 'Login'),
+                            : Text(_isRegister ? "Register" : "Login"),
                       ),
                     ),
                   ],
@@ -138,7 +194,7 @@ class LoginScreenState extends State<LoginScreen> {
     try {
       final client = Provider.of<Client>(context, listen: false);
 
-      await client.checkHomeserver(Uri.http("$_homeserver:8008", ''));
+      await client.checkHomeserver(Uri.https(_homeserver, ""));
 
       if (_isRegister) {
         await client.register(
@@ -146,13 +202,13 @@ class LoginScreenState extends State<LoginScreen> {
             password: _passwordCtrl.text,
             auth: AuthenticationData(type: AuthenticationTypes.dummy),
             initialDeviceDisplayName:
-                'ChitChat ${Platform.operatingSystem}${kReleaseMode ? '' : 'Debug'}');
+                "AptusAware ${Platform.operatingSystem}${kReleaseMode ? "" : "Debug"}");
       } else {
         await client.login(LoginType.mLoginPassword,
             password: _passwordCtrl.text,
             identifier: AuthenticationUserIdentifier(user: _usernameCtrl.text),
             initialDeviceDisplayName:
-                'ChitChat ${Platform.operatingSystem}${kReleaseMode ? '' : 'Debug'}');
+                "AptusAware ${Platform.operatingSystem}${kReleaseMode ? "" : "Debug"}");
       }
 
       await client.setDisplayName(

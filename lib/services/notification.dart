@@ -60,7 +60,7 @@ class Notifications {
       defaultChannel.id,
       defaultChannel.name,
       channelDescription: defaultChannel.description,
-      sound: defaultChannel.sound,
+      // sound: defaultChannel.sound,
       importance: defaultChannel.importance,
       priority: Priority.high,
     ),
@@ -76,7 +76,7 @@ class Notifications {
       mediumAlertChannel.id,
       mediumAlertChannel.name,
       channelDescription: mediumAlertChannel.description,
-      sound: mediumAlertChannel.sound,
+      // sound: mediumAlertChannel.sound,
       importance: mediumAlertChannel.importance,
       priority: Priority.high,
     ),
@@ -92,7 +92,7 @@ class Notifications {
       hightAlertChannel.id,
       hightAlertChannel.name,
       channelDescription: hightAlertChannel.description,
-      sound: hightAlertChannel.sound,
+      // sound: hightAlertChannel.sound,
       importance: hightAlertChannel.importance,
       priority: Priority.high,
     ),
@@ -108,7 +108,7 @@ class Notifications {
       criticalAlertChannel.id,
       criticalAlertChannel.name,
       channelDescription: criticalAlertChannel.description,
-      sound: criticalAlertChannel.sound,
+      // sound: criticalAlertChannel.sound,
       importance: criticalAlertChannel.importance,
       priority: Priority.high,
     ),
@@ -158,7 +158,7 @@ class NotificationService extends Notifications {
     initAndroidChannels(notifications);
 
     const androidSettings = AndroidInitializationSettings(
-      '@mipmap/ic_launcher',
+      '@mipmap/launcher_icon',
     );
 
     const iosSettings = DarwinInitializationSettings();

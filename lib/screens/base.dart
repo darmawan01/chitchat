@@ -1,6 +1,7 @@
-import 'package:chitchat/screens/history.dart';
-import 'package:chitchat/screens/profile.dart';
-import 'package:chitchat/screens/rooms.dart';
+import 'package:aptus_aware/screens/history.dart';
+import 'package:aptus_aware/screens/profile.dart';
+import 'package:aptus_aware/screens/rooms/rooms.dart';
+import 'package:aptus_aware/utils/consts.dart';
 import 'package:flutter/material.dart';
 
 class BaseScreen extends StatefulWidget {
@@ -60,7 +61,7 @@ class _BaseScreenState extends State<BaseScreen> {
                 icon: Icon(
                   Icons.history,
                   size: 30,
-                  color: _page == 0 ? Colors.blueAccent : Colors.black45,
+                  color: _page == 0 ? Colorized.primary : Colors.black45,
                 ),
               ),
               IconButton(
@@ -72,7 +73,7 @@ class _BaseScreenState extends State<BaseScreen> {
                 icon: Icon(
                   Icons.person_2_outlined,
                   size: 30,
-                  color: _page == 2 ? Colors.blueAccent : Colors.black45,
+                  color: _page == 2 ? Colorized.primary : Colors.black45,
                 ),
               ),
             ],
@@ -89,7 +90,7 @@ class _BaseScreenState extends State<BaseScreen> {
           height: 70,
           width: 70,
           decoration: BoxDecoration(
-            color: _page == 1 ? Colors.blueAccent : Colors.grey,
+            color: _page == 1 ? Colorized.primary : Colors.grey,
             shape: BoxShape.circle,
           ),
           child: const Icon(
